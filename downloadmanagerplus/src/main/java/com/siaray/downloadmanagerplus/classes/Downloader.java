@@ -479,8 +479,8 @@ public class Downloader {
         SQLiteDatabase db = mContext.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
         query = "SELECT * FROM "
                 + Constants.DOWNLOAD_DB_TABLE
-                + " WHERE field_id = "
-                + mFieldId + ";";
+                + " WHERE field_id = '"
+                + mFieldId + "';";
 
         Cursor cur = db.rawQuery(query, null);
         cur.moveToFirst();

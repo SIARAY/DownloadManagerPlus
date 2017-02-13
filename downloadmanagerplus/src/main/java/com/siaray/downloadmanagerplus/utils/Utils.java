@@ -83,7 +83,7 @@ public class Utils {
         SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
         try {
 
-            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE field_id=" + fieldId);
+            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE field_id='" + fieldId+"'");
         } catch (Exception e) {
             return false;
         } finally {
