@@ -15,6 +15,8 @@ import com.siaray.downloadmanagerplus.enums.DownloadStatus;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import com.siaray.downloadmanagerplus.utils.Log;
 
+import java.io.File;
+
 public class NormalActivity extends AppCompatActivity {
 
     private FileItem item;
@@ -47,18 +49,19 @@ public class NormalActivity extends AppCompatActivity {
                         .setListener(listener)
                         .saveDownloadHistory(item.getId())
                         .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
-                         , Utils.getFileName(item.getLink()))
+                                , Utils.getFileName(item.getLink()))
                         .setNotificationTitle(Utils.getFileName(item.getLink()));
                 if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING)
                     downloader.cancel(item.getId());
                 else if (downloader.getStatus(item.getId()) == DownloadStatus.SUCCESSFUL) {
                     com.siaray.downloadmanagerplus.utils.Utils
-                            .openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getId()));
+                            .openFile(NormalActivity.this, Environment.getExternalStorageDirectory()
+                                    + File.separator + downloader.getDownloadedFilePath(item.getId()));
                 } else
                     downloader.start();
             }
         });
-        showPersent();
+        showPercent();
 
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,12 +73,12 @@ public class NormalActivity extends AppCompatActivity {
                                 , Utils.getFileName(item.getLink()))
                         .setNotificationTitle(Utils.getFileName(item.getLink()));
                 //if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING)
-                    downloader.deleteFile(item.getId());
+                downloader.deleteFile(item.getId());
             }
         });
     }
 
-    private void showPersent() {
+    private void showPercent() {
         new Downloader(NormalActivity.this, MainActivity.downloadManager, item.getLink())
                 .setListener(listener)
                 .saveDownloadHistory(item.getId())
@@ -125,7 +128,7 @@ public class NormalActivity extends AppCompatActivity {
         @Override
         public void OnMessage(String msg) {
             ivAction.setImageResource(R.mipmap.ic_start);
-            Toast.makeText(NormalActivity.this, ""+msg, Toast.LENGTH_SHORT).show();
+            Toast.makeText(NormalActivity.this, "" + msg, Toast.LENGTH_SHORT).show();
             numberProgressBar.setProgress(0);
         }
     };

@@ -28,9 +28,9 @@
         android:layout_marginTop="10dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:gravity="center"
         android:visibility="gone"
-        android:text="ListView" />
+        android:gravity="center"
+        android:text="Test" />
 
     <Button
         android:id="@+id/button3"

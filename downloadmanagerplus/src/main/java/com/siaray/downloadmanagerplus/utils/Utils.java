@@ -2,6 +2,7 @@ package com.siaray.downloadmanagerplus.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Environment;
 
@@ -13,18 +14,15 @@ import java.io.File;
 
 public class Utils {
 
-    ////////////////////////////////////////////////////////////////////////////
     public static boolean createDownloadDir() {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                 .mkdirs();
     }
 
-    ////////////////////////////////////////////////////////////////////////////
     public static String getFileName(String url) {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
     public static void openFile(Context context, String url) {
         if (url == null)
             return;
@@ -78,5 +76,125 @@ public class Utils {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    public static boolean deleteDownload(Context context, String fieldId) {
+
+        SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+        try {
+
+            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE field_id=" + fieldId);
+        } catch (Exception e) {
+            return false;
+        } finally {
+            db.close();
+        }
+        return true;
+    }
+
+    public static void createDBTables(Context context) {
+        SQLiteDatabase db = null;
+        try {
+            db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS ["
+                    + Constants.DOWNLOAD_DB_TABLE
+                    + "] ("
+                    + "[id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+                    + "[field_id] NVARCHAR NOT NULL, "
+                    + "[link] NVARCHAR, "
+                    + "[download_id] LONG, "
+                    + "UNIQUE(field_id) "
+                    + ");");
+
+        } catch (Exception e) {
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+
+    }
+
+    public static void updateDB(Context context
+            , String fieldId
+            , String url
+            , long downloadId) {
+        if (fieldId != null) {
+            SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+            try {
+                db.execSQL("INSERT OR REPLACE INTO "
+                        + Constants.DOWNLOAD_DB_TABLE
+                        + " ( id, field_id, link, download_id ) "
+                        + "VALUES "
+                        + "((SELECT id FROM "
+                        + Constants.DOWNLOAD_DB_TABLE
+                        + " WHERE field_id = '"
+                        + fieldId
+                        + "'),'"
+                        + fieldId
+                        + "', '"
+                        + url
+                        + "',"
+                        + downloadId
+                        + ");");
+            } catch (Exception e) {
+            } finally {
+                db.close();
+            }
+        }
+    }
+
+    public static void addToThreadList(String fieldId, Thread thread) {
+        Constants.fieldList.add(fieldId);
+        Constants.threadList.add(thread);
+        Log.i("add: " + Constants.fieldList.toString());
+        //Log.i("no add: " + Constants.fieldList.toString());
+
+    }
+
+    public static void removeFromThreadList(String fieldId) {
+        int index = getIdListIndex(fieldId);
+        String tn="";
+        if (index >= 0) {
+
+            if (index < Constants.fieldList.size()
+                    && Constants.fieldList.get(index) != null) {
+                Constants.fieldList.remove(index);
+                Log.i("remove f list: " + Constants.fieldList.toString()+" id:"+tn);
+            }
+
+            if (index < Constants.threadList.size()
+                    && Constants.threadList.get(index) != null) {
+                tn=Constants.threadList.get(index).getName();
+                if (Constants.threadList.get(index).isAlive()
+                        || !Constants.threadList.get(index).isInterrupted()) {
+                    Log.i("thread stoping:" + Constants.threadList.get(index).getName()+" id:"+tn);
+                    Constants.threadList.get(index).interrupt();
+                }
+
+                Constants.threadList.remove(index);
+
+                Log.i("remove t list: " + Constants.threadList.toString()+" id:"+tn);
+                return;
+            }
+
+            Log.i("no remove:null: " + Constants.fieldList.toString()+" id:"+tn);
+
+            return;
+        }
+        Log.i("no remove: " + Constants.fieldList.toString()
+                + Constants.threadList.toString()+" id:"+tn);
+    }
+
+    public static int getIdListIndex(String fieldId) {
+        int index = Constants.fieldList.indexOf(fieldId);
+        Log.i("index: " + index+" :f:"+fieldId);
+        return index;
+    }
+    public static int getThreadListIndex(Thread thread) {
+        int index = Constants.threadList.indexOf(thread);
+        Log.i("index: " + index+" :t:"+thread);
+        return index;
     }
 }
