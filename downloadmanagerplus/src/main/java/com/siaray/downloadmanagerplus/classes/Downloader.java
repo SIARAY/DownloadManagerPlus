@@ -7,9 +7,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Environment;
+import android.text.TextUtils;
 
 import com.siaray.downloadmanagerplus.R;
 import com.siaray.downloadmanagerplus.enums.DownloadStatus;
+import com.siaray.downloadmanagerplus.enums.Result;
+import com.siaray.downloadmanagerplus.interfaces.ActionListener;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import com.siaray.downloadmanagerplus.utils.Constants;
 import com.siaray.downloadmanagerplus.utils.Utils;
@@ -28,11 +31,11 @@ public class Downloader {
     private String mFileName;
     private String mDestinationDir;
     private String mReason;
-    private String mFieldId;
+    private String mId = null;
     private String mLocalUri;
     private DownloadListener mListener;
     private DownloadManager mDownloadManager;
-    private DownloadStatus mDownloadStatus = DownloadStatus.CANSELED;
+    private DownloadStatus mDownloadStatus = DownloadStatus.CANCELED;
     private long mDownloadId;
     private int mPercent;
     private int mDownloadedBytes;
@@ -49,14 +52,19 @@ public class Downloader {
         mDownloadManager = downloadManager;
     }
 
-    public Downloader saveDownloadHistory(String fieldId) {
-        mFieldId = fieldId;
+    public Downloader setDownloadId(String id) {
+        mId = id;
         Utils.createDBTables(mContext);
         return this;
     }
 
     public Downloader setListener(DownloadListener listener) {
         mListener = listener;
+        return this;
+    }
+
+    public Downloader setUrl(String url) {
+        mUrl = url;
         return this;
     }
 
@@ -78,38 +86,34 @@ public class Downloader {
     }
 
     public void start() {
+        if (checkErrors()) {
+            return;
+        }
+        forcedDownload();
+    }
 
+    private boolean checkErrors() {
+        if (TextUtils.isEmpty(mUrl)) {
+            mListener.OnMessage(Result.ERROR, mContext.getString(R.string.url_not_found));
+            return true;
+        }
+        if (TextUtils.isEmpty(mId)) {
+            mListener.OnMessage(Result.ERROR, mContext.getString(R.string.id_not_found));
+            return true;
+        }
         if (isDownloadRunning()) {
             if (mListener != null) {
                 if (mDownloadStatus == DownloadStatus.SUCCESSFUL)
-                    mListener.OnMessage("Download Completed");
+                    mListener.OnComplete(null);
                 else
-                    mListener.OnMessage("Download is Running");
+                    mListener.OnMessage(Result.MESSAGE, mContext.getString(R.string.download_in_progress));
             }
-            return;
+            return true;
         }
-        createDownloadDir();
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
-
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
-                | DownloadManager.Request.NETWORK_MOBILE)
-                .setTitle(mTitle)
-                .setAllowedOverRoaming(false)
-                .setVisibleInDownloadsUi(true)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        //.setDescription("Something useful. No, really.")
-        if (mDestinationDir != null && mFileName != null)
-            request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
-
-
-        mDownloadId = mDownloadManager.enqueue(request);
-
-        Utils.updateDB(mContext, mFieldId, mUrl, mDownloadId);
-        showProgress();
+        return false;
     }
 
     public void forcedDownload() {
-
         createDownloadDir();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
 
@@ -119,19 +123,17 @@ public class Downloader {
                 .setAllowedOverRoaming(false)
                 .setVisibleInDownloadsUi(true)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        //.setDescription("Something useful. No, really.")
         if (mDestinationDir != null && mFileName != null)
             request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
 
-
         mDownloadId = mDownloadManager.enqueue(request);
 
-        Utils.updateDB(mContext, mFieldId, mUrl, mDownloadId);
+        Utils.updateDB(mContext, mId, mUrl, mDownloadId);
         showProgress();
     }
 
     private boolean isDownloadRunning() {
-        mDownloadStatus = getStatus(mFieldId);
+        mDownloadStatus = getStatus(mId);
         if (mDownloadStatus == DownloadStatus.RUNNING
                 || mDownloadStatus == DownloadStatus.PENDING
                 || mDownloadStatus == DownloadStatus.PAUSED
@@ -141,111 +143,123 @@ public class Downloader {
         return false;
     }
 
-    public void cancel(String fieldId) {
-        mFieldId = fieldId;
+    public void cancel(String id) {
+        mId = id;
         findDownloadHistory();
         if (mDownloadId > 0) {
             mDownloadManager.remove(mDownloadId);
-            Utils.deleteDownload(mContext, fieldId);
+            Utils.deleteDownload(mContext, id);
         }
     }
 
-    public void deleteFile(String fieldId) {
-        cancel(fieldId);
-        String filePath = getDownloadedFilePath(fieldId);
+    public boolean deleteFile(String id, ActionListener listener) {
+        String filePath = getDownloadedFilePath(id);
         if (filePath != null) {
             File downloadedFile = new File(filePath);
             if (downloadedFile.exists()) {
-                if (downloadedFile.delete()) {
-                    mListener.OnMessage("Deleted");
-                    return;
+                boolean deleted = downloadedFile.delete();
+                if (deleted) {
+                    cancel(id);
+                    listener.OnSuccess(mContext.getString(R.string.file_deleted));
+                    return true;
+                } else {
+                    listener.OnFailure(mContext.getString(R.string.cannot_delete));
+                    return false;
                 }
+            } else {
+                listener.OnFailure(mContext.getString(R.string.file_not_found));
+                return false;
             }
         }
-        mListener.OnMessage("Error: " + filePath);
-
+        listener.OnFailure(mContext.getString(R.string.path_not_found));
+        return false;
     }
 
-    public DownloadStatus getStatus(String fieldId) {
-        if (fieldId == null) {
+    public DownloadStatus getStatus(String id) {
+        if (id == null) {
             return DownloadStatus.NONE;
         }
-        mFieldId = fieldId;
+        mId = id;
         findDownloadHistory();
         getDownloadStatusWithReason();
         return mDownloadStatus;
     }
 
-    public String getDownloadedFilePath(String fieldId) {
-        mFieldId = fieldId;
+    public String getDownloadedFilePath(String id) {
+        mId = id;
         findDownloadHistory();
         getDownloadStatusWithReason();
         String path = mLocalUri;
-        if (mDestinationDir != null && mFileName != null)
-            path = mDestinationDir + File.separator + mFileName;
+        /*if (mDestinationDir != null && mFileName != null)
+            path = mDestinationDir + File.separator + mFileName;*/
         return path;
     }
 
     public void showProgress() {
         if (findDownloadHistory()) {
-            final Thread thread=new Thread(new Runnable() {
+            final Thread thread = new Thread(new Runnable() {
 
                 @Override
                 public void run() {
+                    final boolean[] continuous = {true};
+                    do {
 
-                        do {
+                        if (mContext != null) {
+                            setDownloadStatusWithReason();
 
-                            if (mContext != null) {
-                                setDownloadStatusWithReason();
+                            ((Activity) mContext).runOnUiThread(new Runnable() {
 
-                                ((Activity) mContext).runOnUiThread(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        String message = statusMessage();
-                                        switch (mDownloadStatus) {
-                                            case SUCCESSFUL:
-                                                mListener.OnComplete(message);
-                                                break;
-                                            case PAUSED:
-                                                mListener.OnPause(message, mReason);
-                                                break;
-                                            case PENDING:
-                                                mListener.OnPending(message);
-                                                break;
-                                            case FAILED:
-                                                mListener.OnFail(message, mReason);
-                                                break;
-                                            case CANSELED:
-                                                mListener.OnCancel(message);
-                                                break;
-                                            default://Running
-                                                mListener.OnRunning(mPercent, mTotalBytes, mDownloadedBytes);
-                                        }
-
+                                @Override
+                                public void run() {
+                                    if (!continuous[0])
+                                        return;
+                                    String message = statusMessage();
+                                    switch (mDownloadStatus) {
+                                        case SUCCESSFUL:
+                                            mListener.OnComplete(message);
+                                            break;
+                                        case PAUSED:
+                                            mListener.OnPause(message, mReason);
+                                            break;
+                                        case PENDING:
+                                            mListener.OnPending(message);
+                                            break;
+                                        case FAILED:
+                                            mListener.OnFail(message, mReason);
+                                            break;
+                                        case CANCELED:
+                                            continuous[0] = false;
+                                            mListener.OnCancel(message);
+                                            break;
+                                        default://Running
+                                            mListener.OnRunning(mPercent, mTotalBytes, mDownloadedBytes);
+                                            break;
                                     }
-                                });
-                            } else {
-                                break;
-                            }
 
-                        } while (((mDownloadStatus == DownloadStatus.RUNNING)
-                                || (mDownloadStatus == DownloadStatus.PAUSED)
-                                || (mDownloadStatus == DownloadStatus.PENDING))
-                                &&(mContext != null)
-                                &&!Thread.interrupted());
+                                }
+                            });
+                        } else {
+                            break;
+                        }
 
-                    int index=com.siaray.downloadmanagerplus.utils.Utils.getThreadListIndex(Thread.currentThread());
-                    if ( index>= 0) {
-                        Utils.removeFromThreadList(mFieldId);
+                    } while (((mDownloadStatus == DownloadStatus.RUNNING)
+                            || (mDownloadStatus == DownloadStatus.PAUSED)
+                            || (mDownloadStatus == DownloadStatus.PENDING))
+                            && (mContext != null)
+                            && !Thread.interrupted()
+                            && continuous[0]);
+
+                    int index = com.siaray.downloadmanagerplus.utils.Utils.getThreadListIndex(Thread.currentThread());
+                    if (index >= 0) {
+                        Utils.removeFromThreadList(mId);
                     }
 
                 }
             });
-            Utils.removeFromThreadList(mFieldId);
-            Utils.addToThreadList(mFieldId,thread);
+            Utils.removeFromThreadList(mId);
+            Utils.addToThreadList(mId, thread);
 
-                thread.start();
+            thread.start();
         }
     }
 
@@ -265,8 +279,8 @@ public class Downloader {
                 msg = mContext.getString(R.string.download_pending);
                 break;
 
-            case CANSELED:
-                msg = mContext.getString(R.string.download_canseled);
+            case CANCELED:
+                msg = mContext.getString(R.string.download_canceled);
                 break;
 
             case SUCCESSFUL:
@@ -357,7 +371,7 @@ public class Downloader {
                 case DownloadManager.STATUS_RUNNING:
                     //statusText = "STATUS_RUNNING";
                     mDownloadStatus = DownloadStatus.RUNNING;
-                    if(mTotalBytes>0) {
+                    if (mTotalBytes > 0) {
                         int percent = (int) ((mDownloadedBytes * 100l) / mTotalBytes);
                         mPercent = percent;
                     }
@@ -370,7 +384,7 @@ public class Downloader {
                     break;
             }
         } else {
-            mDownloadStatus = DownloadStatus.CANSELED;//Download Canseled
+            mDownloadStatus = DownloadStatus.CANCELED;
         }
         cursor.close();
 
@@ -392,7 +406,6 @@ public class Downloader {
             int reason = cursor.getInt(columnReason);
             int filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
             mLocalUri = cursor.getString(filenameIndex);
-
             switch (currentDownloadStatus) {
                 case DownloadManager.STATUS_FAILED:
                     //statusText = "STATUS_FAILED";
@@ -467,7 +480,7 @@ public class Downloader {
                     mReason = null;
             }
         } else {
-            mDownloadStatus = DownloadStatus.CANSELED;//Download Canseled
+            mDownloadStatus = DownloadStatus.CANCELED;
         }
         cursor.close();
 
@@ -475,19 +488,23 @@ public class Downloader {
 
     private boolean findDownloadHistory() {
         boolean isExist = false;
+        if (mId == null)
+            return isExist;
+
         String query;
         SQLiteDatabase db = mContext.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
         query = "SELECT * FROM "
                 + Constants.DOWNLOAD_DB_TABLE
                 + " WHERE field_id = '"
-                + mFieldId + "';";
+                + mId + "';";
 
-        Cursor cur = db.rawQuery(query, null);
-        cur.moveToFirst();
+        Cursor cur = null;
         try {
+            cur = db.rawQuery(query, null);
+            cur.moveToFirst();
             if (cur != null && cur.getCount() > 0) {
                 isExist = true;
-                mFieldId = cur.getString(cur.getColumnIndex("field_id"));
+                mId = cur.getString(cur.getColumnIndex("field_id"));
                 mUrl = cur.getString(cur.getColumnIndex("link"));
                 mDownloadId = cur.getLong(cur.getColumnIndex("download_id"));
             }
@@ -495,8 +512,10 @@ public class Downloader {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            cur.close();
-            db.close();
+            if (cur != null)
+                cur.close();
+            if (db != null)
+                db.close();
             return isExist;
         }
     }

@@ -29,9 +29,7 @@ public class Utils {
         Uri uri = Uri.fromFile(new File(url));
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        // Check what kind of file you are trying to open, by comparing the url with extensions.
-        // When the if condition is matched, plugin sets the correct intent (mime) type,
-        // so Android knew what application to use to open the file
+
         if (url.toString().contains(".doc") || url.toString().contains(".docx")) {
             // Word document
             intent.setDataAndType(uri, "application/msword");
@@ -45,7 +43,7 @@ public class Utils {
             // Excel file
             intent.setDataAndType(uri, "application/vnd.ms-excel");
         } else if (url.toString().contains(".zip") || url.toString().contains(".rar")) {
-            // WAV audio file
+            // zip file
             intent.setDataAndType(uri, "application/zip");
         } else if (url.toString().contains(".rtf")) {
             // RTF file
@@ -78,12 +76,12 @@ public class Utils {
         context.startActivity(intent);
     }
 
-    public static boolean deleteDownload(Context context, String fieldId) {
+    public static boolean deleteDownload(Context context, String id) {
 
         SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
         try {
 
-            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE field_id='" + fieldId+"'");
+            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE field_id='" + id + "'");
         } catch (Exception e) {
             return false;
         } finally {
@@ -117,10 +115,10 @@ public class Utils {
     }
 
     public static void updateDB(Context context
-            , String fieldId
+            , String id
             , String url
             , long downloadId) {
-        if (fieldId != null) {
+        if (id != null) {
             SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
             try {
                 db.execSQL("INSERT OR REPLACE INTO "
@@ -130,9 +128,9 @@ public class Utils {
                         + "((SELECT id FROM "
                         + Constants.DOWNLOAD_DB_TABLE
                         + " WHERE field_id = '"
-                        + fieldId
+                        + id
                         + "'),'"
-                        + fieldId
+                        + id
                         + "', '"
                         + url
                         + "',"
@@ -140,61 +138,67 @@ public class Utils {
                         + ");");
             } catch (Exception e) {
             } finally {
-                db.close();
+                if (db != null)
+                    db.close();
             }
         }
     }
 
-    public static void addToThreadList(String fieldId, Thread thread) {
-        Constants.fieldList.add(fieldId);
+    public static void addToThreadList(String id, Thread thread) {
+        if(id==null)
+            return;
+        Constants.fieldList.add(id);
         Constants.threadList.add(thread);
         Log.i("add: " + Constants.fieldList.toString());
         //Log.i("no add: " + Constants.fieldList.toString());
 
     }
 
-    public static void removeFromThreadList(String fieldId) {
-        int index = getIdListIndex(fieldId);
-        String tn="";
+    public static void removeFromThreadList(String id) {
+        if(id==null)
+            return;
+        int index = getIdListIndex(id);
+        String tn = "";
         if (index >= 0) {
 
             if (index < Constants.fieldList.size()
                     && Constants.fieldList.get(index) != null) {
                 Constants.fieldList.remove(index);
-                Log.i("remove f list: " + Constants.fieldList.toString()+" id:"+tn);
+                Log.i("remove f list: " + Constants.fieldList.toString() + " id:" + tn);
             }
 
             if (index < Constants.threadList.size()
                     && Constants.threadList.get(index) != null) {
-                tn=Constants.threadList.get(index).getName();
+                tn = Constants.threadList.get(index).getName();
                 if (Constants.threadList.get(index).isAlive()
                         || !Constants.threadList.get(index).isInterrupted()) {
-                    Log.i("thread stoping:" + Constants.threadList.get(index).getName()+" id:"+tn);
+                    Log.i("thread stoping:" + Constants.threadList.get(index).getName() + " id:" + tn);
                     Constants.threadList.get(index).interrupt();
                 }
 
                 Constants.threadList.remove(index);
 
-                Log.i("remove t list: " + Constants.threadList.toString()+" id:"+tn);
+                Log.i("remove t list: " + Constants.threadList.toString() + " id:" + tn);
                 return;
             }
 
-            Log.i("no remove:null: " + Constants.fieldList.toString()+" id:"+tn);
+            Log.i("no remove:null: " + Constants.fieldList.toString() + " id:" + tn);
 
             return;
         }
         Log.i("no remove: " + Constants.fieldList.toString()
-                + Constants.threadList.toString()+" id:"+tn);
+                + Constants.threadList.toString() + " id:" + tn);
     }
 
-    public static int getIdListIndex(String fieldId) {
-        int index = Constants.fieldList.indexOf(fieldId);
-        Log.i("index: " + index+" :f:"+fieldId);
+    public static int getIdListIndex(String id) {
+        int index = Constants.fieldList.indexOf(id);
+        Log.i("index: " + index + " :f:" + id);
         return index;
     }
+
     public static int getThreadListIndex(Thread thread) {
         int index = Constants.threadList.indexOf(thread);
-        Log.i("index: " + index+" :t:"+thread);
+        Log.i("index: " + index + " :t:" + thread);
         return index;
     }
 }

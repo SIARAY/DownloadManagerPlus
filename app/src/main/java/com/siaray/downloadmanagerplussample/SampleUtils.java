@@ -6,13 +6,22 @@ import java.util.List;
  * Created by Siamak on 28/01/2017.
  */
 
-public class Utils {
-    public static FileItem getDownloadItem() {
+public class SampleUtils {
+    public static FileItem getFirstDownloadItem() {
         FileItem item = new FileItem();
-        item.setId("bc");
+        item.setId("1245");
         //String link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
         //String link = "http://hw2.asset.aparat.com/aparat-video/a_b90di71g188j92gm947076g6i3594d032g6457306105-471s__31c96.mp4";
         String link = "http://dolly.roslin.ed.ac.uk/wp-content/uploads/2016/01/DollySideView.jpg";
+        item.setLink(link);
+        return item;
+    }
+
+    public static FileItem getSecondDownloadItem() {
+        FileItem item = new FileItem();
+        item.setId("1249");
+        //String link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
+        String link = "http://hw2.asset.aparat.com/aparat-video/a_b90di71g188j92gm947076g6i3594d032g6457306105-471s__31c96.mp4";
         item.setLink(link);
         return item;
     }
@@ -45,7 +54,7 @@ public class Utils {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    public static String getFileName(String url) {
+    /*public static String getFileName(String url) {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
-    }
+    }*/
 }

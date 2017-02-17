@@ -9,7 +9,7 @@ public enum DownloadStatus {
     PAUSED(-2),
     PENDING(-3),
     FAILED(-4),
-    CANSELED(-5),
+    CANCELED(-5),
     RUNNING(-6),
     NONE(-7);
 

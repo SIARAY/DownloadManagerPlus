@@ -1,5 +1,7 @@
 package com.siaray.downloadmanagerplus.interfaces;
 
+import com.siaray.downloadmanagerplus.enums.Result;
+
 /**
  * Created by Siamak on 16/01/2017.
  */
@@ -18,6 +20,6 @@ public interface DownloadListener {
 
     void OnRunning(int percent, int mTotalBytes, int mDownloadedBytes);
 
-    void OnMessage(String msg);
+    void OnMessage(Result results, String msg);
 
 }
