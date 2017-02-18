@@ -185,6 +185,10 @@ public class Downloader {
         return mDownloadStatus;
     }
 
+    private boolean isFileExist() {
+        return (new File(mLocalUri).exists());
+    }
+
     public String getDownloadedFilePath(String id) {
         mId = id;
         findDownloadHistory();
@@ -205,7 +209,7 @@ public class Downloader {
                     do {
 
                         if (mContext != null) {
-                            setDownloadStatusWithReason();
+                            getDownloadStatusWithReason();
 
                             ((Activity) mContext).runOnUiThread(new Runnable() {
 
@@ -295,7 +299,7 @@ public class Downloader {
         return (msg);
     }
 
-    private void setDownloadStatusWithReason() {
+    private void getDownloadStatusWithReason() {
 
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(mDownloadId);
@@ -310,7 +314,8 @@ public class Downloader {
             int columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
             int reason = cursor.getInt(columnReason);
             int filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
-            String filename = cursor.getString(filenameIndex);
+            mLocalUri = cursor.getString(filenameIndex);
+
             switch (currentDownloadStatus) {
                 case DownloadManager.STATUS_FAILED:
                     //statusText = "STATUS_FAILED";
@@ -377,11 +382,19 @@ public class Downloader {
                     }
                     mReason = null;
                     break;
+
                 case DownloadManager.STATUS_SUCCESSFUL:
                     //statusText = "STATUS_SUCCESSFUL";
                     mDownloadStatus = DownloadStatus.SUCCESSFUL;
                     mReason = null;//"Filename:\n" + filename;
+                    if(!isFileExist()){
+                        mDownloadStatus = DownloadStatus.CANCELED;
+                        cancel(mId);
+                    }
                     break;
+                default:
+                    mDownloadStatus = DownloadStatus.NONE;
+                    mReason = null;
             }
         } else {
             mDownloadStatus = DownloadStatus.CANCELED;
@@ -390,7 +403,7 @@ public class Downloader {
 
     }
 
-    private void getDownloadStatusWithReason() {
+    /*private void getDownloadStatusWithReason() {
 
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(mDownloadId);
@@ -472,8 +485,13 @@ public class Downloader {
                     break;
                 case DownloadManager.STATUS_SUCCESSFUL:
                     //statusText = "STATUS_SUCCESSFUL";
+                    Log.i("id: "+mDownloadId+ " status: "+mDownloadStatus);
                     mDownloadStatus = DownloadStatus.SUCCESSFUL;
                     mReason = null;//"Filename:\n" + filename;
+                    if(!isFileExist()){
+                        mDownloadStatus = DownloadStatus.CANCELED;
+                        Log.i("id: "+mDownloadId+ " change status: "+mDownloadStatus);
+                    }
                     break;
                 default:
                     mDownloadStatus = DownloadStatus.NONE;
@@ -484,7 +502,7 @@ public class Downloader {
         }
         cursor.close();
 
-    }
+    }*/
 
     private boolean findDownloadHistory() {
         boolean isExist = false;
