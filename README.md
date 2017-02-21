@@ -3,5 +3,5 @@
 Using faster and easier than Android Download Manager
 
 <a>
-![](https://gifyu.com/images/out20c239.md.gif)
+![](https://github.com/SIARAY/DownloadManagerPlus/blob/master/screenshot.gif?raw=true)
 </a>
