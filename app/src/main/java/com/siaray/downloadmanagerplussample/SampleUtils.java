@@ -7,24 +7,25 @@ import java.util.List;
  */
 
 public class SampleUtils {
-    public static FileItem getFirstDownloadItem() {
+    public static FileItem getDownloadItem(int number) {
         FileItem item = new FileItem();
-        item.setId("1245");
-        //String link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
-        //String link = "http://hw2.asset.aparat.com/aparat-video/a_b90di71g188j92gm947076g6i3594d032g6457306105-471s__31c96.mp4";
-        String link = "http://dolly.roslin.ed.ac.uk/wp-content/uploads/2016/01/DollySideView.jpg";
-        item.setLink(link);
+
+        if(number==1) {
+            item.setId("id1245");
+            String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
+            item.setLink(link);
+        }else if(number==2){
+            item.setId("id1249");
+            String link = "http://as3.cdn.asset.aparat.com/aparat-video/6a264ee6d22be3ab6a00fd3a774316424062813-360p__64493.mp4";
+            item.setLink(link);
+        }else{
+            item.setId("id1280");
+            String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
+            item.setLink(link);
+        }
         return item;
     }
 
-    public static FileItem getSecondDownloadItem() {
-        FileItem item = new FileItem();
-        item.setId("1249");
-        //String link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
-        String link = "http://hw2.asset.aparat.com/aparat-video/a_b90di71g188j92gm947076g6i3594d032g6457306105-471s__31c96.mp4";
-        item.setLink(link);
-        return item;
-    }
 
     ////////////////////////////////////////////////////////////////////////////
     public static void getFileList(List<FileItem> list, int number) {

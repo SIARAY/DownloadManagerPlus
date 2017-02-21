@@ -20,6 +20,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".NormalActivity" />
+
+        <meta-data android:name="com.samsung.android.sdk.multiwindow.enable"
+            android:value="true"/>
     </application>
 
 </manifest>

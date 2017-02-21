@@ -16,7 +16,6 @@ import com.siaray.downloadmanagerplus.enums.DownloadStatus;
 import com.siaray.downloadmanagerplus.enums.Result;
 import com.siaray.downloadmanagerplus.interfaces.ActionListener;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
-import com.siaray.downloadmanagerplus.utils.Log;
 import com.siaray.downloadmanagerplus.utils.Utils;
 
 public class NormalActivity extends AppCompatActivity {
@@ -31,15 +30,20 @@ public class NormalActivity extends AppCompatActivity {
 
     private void inflateUi() {
         LinearLayout parent = (LinearLayout) findViewById(R.id.main_container);
-        View firstView = getLayoutInflater().inflate(R.layout.download_list_item, null);
-        parent.addView(firstView);
-        FileItem firstItem = SampleUtils.getFirstDownloadItem();
-        initUi(firstView, firstItem);
+        View fView = getLayoutInflater().inflate(R.layout.download_list_item, null);
+        parent.addView(fView);
+        FileItem fItem = SampleUtils.getDownloadItem(1);
+        initUi(fView, fItem);
 
-        View secondView = getLayoutInflater().inflate(R.layout.download_list_item, null);
-        parent.addView(secondView);
-        FileItem secondItem = SampleUtils.getSecondDownloadItem();
-        initUi(secondView, secondItem);
+        View sView = getLayoutInflater().inflate(R.layout.download_list_item, null);
+        parent.addView(sView);
+        FileItem sItem = SampleUtils.getDownloadItem(2);
+        initUi(sView, sItem);
+
+        View tView = getLayoutInflater().inflate(R.layout.download_list_item, null);
+        parent.addView(tView);
+        FileItem tItem = SampleUtils.getDownloadItem(3);
+        initUi(tView, tItem);
     }
 
     private void initUi(View view, final FileItem item) {
