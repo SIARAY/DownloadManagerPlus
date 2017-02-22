@@ -24,7 +24,6 @@ public class NormalActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
-        //initUi();
         inflateUi();
     }
 
@@ -97,14 +96,14 @@ public class NormalActivity extends AppCompatActivity {
     private ActionListener getDeleteListener(final ImageView ivAction, final ViewGroup btnDelete, final NumberProgressBar numberProgressBar) {
         return new ActionListener() {
             @Override
-            public void OnSuccess(String message) {
+            public void onSuccess(String message) {
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
                 Toast.makeText(NormalActivity.this, "" + message, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void OnFailure(String message) {
+            public void onFailure(String message) {
                 Toast.makeText(NormalActivity.this, "" + message, Toast.LENGTH_SHORT).show();
 
             }
@@ -115,47 +114,47 @@ public class NormalActivity extends AppCompatActivity {
             , final NumberProgressBar numberProgressBar) {
         return new DownloadListener() {
             @Override
-            public void OnComplete(String msg) {
-                //Log.i("OnComplete called: " + msg);
+            public void onComplete(String msg) {
+                //Log.i("onComplete called: " + msg);
                 ivAction.setImageResource(R.mipmap.ic_complete);
                 numberProgressBar.setProgress(100);
             }
 
             @Override
-            public void OnPause(String msg, String reason) {
-                //Log.i("OnPause called: " + msg);
+            public void onPause(String msg, String reason) {
+                //Log.i("onPause called: " + msg);
 
             }
 
             @Override
-            public void OnPending(String msg) {
-                //Log.i("OnPending called: " + msg);
+            public void onPending(String msg) {
+                //Log.i("onPending called: " + msg);
 
             }
 
             @Override
-            public void OnFail(String msg, String reason) {
-                //Log.i("OnFail called: " + msg);
+            public void onFail(String msg, String reason) {
+                //Log.i("onFail called: " + msg);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
 
             }
 
             @Override
-            public void OnCancel(String msg) {
+            public void onCancel(String msg) {
                 //Log.i("onCancel called: " + msg);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
             }
 
             @Override
-            public void OnRunning(int percent, int mTotalBytes, int mDownloadedBytes) {
+            public void onRunning(int percent, int mTotalBytes, int mDownloadedBytes) {
                 ivAction.setImageResource(R.mipmap.ic_cancel);
                 numberProgressBar.setProgress(percent);
             }
 
             @Override
-            public void OnMessage(Result result, String msg) {
+            public void onMessage(Result result, String msg) {
                 if (result == Result.ERROR) {
                     ivAction.setImageResource(R.mipmap.ic_start);
                     numberProgressBar.setProgress(0);

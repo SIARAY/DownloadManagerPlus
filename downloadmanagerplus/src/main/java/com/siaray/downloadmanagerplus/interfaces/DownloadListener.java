@@ -8,18 +8,18 @@ import com.siaray.downloadmanagerplus.enums.Result;
 
 public interface DownloadListener {
 
-    void OnComplete(String msg);
+    void onComplete(String msg);
 
-    void OnPause(String msg, String reason);
+    void onPause(String msg, String reason);
 
-    void OnPending(String msg);
+    void onPending(String msg);
 
-    void OnFail(String msg, String reason);
+    void onFail(String msg, String reason);
 
-    void OnCancel(String msg);
+    void onCancel(String msg);
 
-    void OnRunning(int percent, int mTotalBytes, int mDownloadedBytes);
+    void onRunning(int percent, int mTotalBytes, int mDownloadedBytes);
 
-    void OnMessage(Result results, String msg);
+    void onMessage(Result results, String msg);
 
 }

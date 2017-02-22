@@ -6,7 +6,7 @@ package com.siaray.downloadmanagerplus.interfaces;
 
 public interface ActionListener {
 
-    void OnSuccess(String message);
+    void onSuccess(String message);
 
-    void OnFailure(String message);
+    void onFailure(String message);
 }

@@ -94,19 +94,19 @@ public class Downloader {
 
     private boolean checkErrors() {
         if (TextUtils.isEmpty(mUrl)) {
-            mListener.OnMessage(Result.ERROR, mContext.getString(R.string.url_not_found));
+            mListener.onMessage(Result.ERROR, mContext.getString(R.string.url_not_found));
             return true;
         }
         if (TextUtils.isEmpty(mId)) {
-            mListener.OnMessage(Result.ERROR, mContext.getString(R.string.id_not_found));
+            mListener.onMessage(Result.ERROR, mContext.getString(R.string.id_not_found));
             return true;
         }
         if (isDownloadRunning()) {
             if (mListener != null) {
                 if (mDownloadStatus == DownloadStatus.SUCCESSFUL)
-                    mListener.OnComplete(null);
+                    mListener.onComplete(null);
                 else
-                    mListener.OnMessage(Result.MESSAGE, mContext.getString(R.string.download_in_progress));
+                    mListener.onMessage(Result.MESSAGE, mContext.getString(R.string.download_in_progress));
             }
             return true;
         }
@@ -160,18 +160,18 @@ public class Downloader {
                 boolean deleted = downloadedFile.delete();
                 if (deleted) {
                     cancel(id);
-                    listener.OnSuccess(mContext.getString(R.string.file_deleted));
+                    listener.onSuccess(mContext.getString(R.string.file_deleted));
                     return true;
                 } else {
-                    listener.OnFailure(mContext.getString(R.string.cannot_delete));
+                    listener.onFailure(mContext.getString(R.string.cannot_delete));
                     return false;
                 }
             } else {
-                listener.OnFailure(mContext.getString(R.string.file_not_found));
+                listener.onFailure(mContext.getString(R.string.file_not_found));
                 return false;
             }
         }
-        listener.OnFailure(mContext.getString(R.string.path_not_found));
+        listener.onFailure(mContext.getString(R.string.path_not_found));
         return false;
     }
 
@@ -220,23 +220,23 @@ public class Downloader {
                                     String message = statusMessage();
                                     switch (mDownloadStatus) {
                                         case SUCCESSFUL:
-                                            mListener.OnComplete(message);
+                                            mListener.onComplete(message);
                                             break;
                                         case PAUSED:
-                                            mListener.OnPause(message, mReason);
+                                            mListener.onPause(message, mReason);
                                             break;
                                         case PENDING:
-                                            mListener.OnPending(message);
+                                            mListener.onPending(message);
                                             break;
                                         case FAILED:
-                                            mListener.OnFail(message, mReason);
+                                            mListener.onFail(message, mReason);
                                             break;
                                         case CANCELED:
                                             continuous[0] = false;
-                                            mListener.OnCancel(message);
+                                            mListener.onCancel(message);
                                             break;
                                         default://Running
-                                            mListener.OnRunning(mPercent, mTotalBytes, mDownloadedBytes);
+                                            mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
                                             break;
                                     }
 
