@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         Button btnDownload = (Button) findViewById(R.id.button1);
         Button btnList = (Button) findViewById(R.id.button2);
+        btnList.setVisibility(View.VISIBLE);
         Button btnShowDownloads = (Button) findViewById(R.id.button3);
         btnDownload.setOnClickListener(this);
         btnList.setOnClickListener(this);
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
-                //intent = new Intent(MainActivity.this, ListActivity.class);
+                intent = new Intent(MainActivity.this, ListActivity.class);
                 break;
 
             case R.id.button3:

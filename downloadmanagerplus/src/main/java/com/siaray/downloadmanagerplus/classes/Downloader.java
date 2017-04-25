@@ -15,6 +15,7 @@ import com.siaray.downloadmanagerplus.enums.Result;
 import com.siaray.downloadmanagerplus.interfaces.ActionListener;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import com.siaray.downloadmanagerplus.utils.Constants;
+import com.siaray.downloadmanagerplus.utils.Strings;
 import com.siaray.downloadmanagerplus.utils.Utils;
 
 import java.io.File;
@@ -194,8 +195,6 @@ public class Downloader {
         findDownloadHistory();
         getDownloadStatusWithReason();
         String path = mLocalUri;
-        /*if (mDestinationDir != null && mFileName != null)
-            path = mDestinationDir + File.separator + mFileName;*/
         return path;
     }
 
@@ -239,7 +238,6 @@ public class Downloader {
                                             mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
                                             break;
                                     }
-
                                 }
                             });
                         } else {
@@ -268,35 +266,35 @@ public class Downloader {
     }
 
     private String statusMessage() {
-        String msg = "Unknown";
+        String message;
 
         switch (mDownloadStatus) {
             case FAILED:
-                msg = mContext.getString(R.string.download_failed);
+                message = mContext.getString(R.string.download_failed);
                 break;
 
             case PAUSED:
-                msg = mContext.getString(R.string.download_paused);
+                message = mContext.getString(R.string.download_paused);
                 break;
 
             case PENDING:
-                msg = mContext.getString(R.string.download_pending);
+                message = mContext.getString(R.string.download_pending);
                 break;
 
             case CANCELED:
-                msg = mContext.getString(R.string.download_canceled);
+                message = mContext.getString(R.string.download_canceled);
                 break;
 
             case SUCCESSFUL:
-                msg = mContext.getString(R.string.download_complete);
+                message = mContext.getString(R.string.download_complete);
                 break;
 
             default:
-                msg = mContext.getString(R.string.download_in_progress);
+                message = mContext.getString(R.string.download_in_progress);
                 break;
         }
 
-        return (msg);
+        return (message);
     }
 
     private void getDownloadStatusWithReason() {
@@ -387,7 +385,7 @@ public class Downloader {
                     //statusText = "STATUS_SUCCESSFUL";
                     mDownloadStatus = DownloadStatus.SUCCESSFUL;
                     mReason = null;//"Filename:\n" + filename;
-                    if(!isFileExist()){
+                    if (!isFileExist()) {
                         mDownloadStatus = DownloadStatus.CANCELED;
                         cancel(mId);
                     }
@@ -403,107 +401,6 @@ public class Downloader {
 
     }
 
-    /*private void getDownloadStatusWithReason() {
-
-        DownloadManager.Query q = new DownloadManager.Query();
-        q.setFilterById(mDownloadId);
-
-        final Cursor cursor = mDownloadManager.query(q);
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            int downloadedBytes = cursor.getInt(cursor
-                    .getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-            int totalBytes = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-            final int currentDownloadStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-            int columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
-            int reason = cursor.getInt(columnReason);
-            int filenameIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
-            mLocalUri = cursor.getString(filenameIndex);
-            switch (currentDownloadStatus) {
-                case DownloadManager.STATUS_FAILED:
-                    //statusText = "STATUS_FAILED";
-                    mDownloadStatus = DownloadStatus.FAILED;
-                    switch (reason) {
-                        case DownloadManager.ERROR_CANNOT_RESUME:
-                            mReason = "ERROR_CANNOT_RESUME";
-                            break;
-                        case DownloadManager.ERROR_DEVICE_NOT_FOUND:
-                            mReason = "ERROR_DEVICE_NOT_FOUND";
-                            break;
-                        case DownloadManager.ERROR_FILE_ALREADY_EXISTS:
-                            mReason = "ERROR_FILE_ALREADY_EXISTS";
-                            break;
-                        case DownloadManager.ERROR_FILE_ERROR:
-                            mReason = "ERROR_FILE_ERROR";
-                            break;
-                        case DownloadManager.ERROR_HTTP_DATA_ERROR:
-                            mReason = "ERROR_HTTP_DATA_ERROR";
-                            break;
-                        case DownloadManager.ERROR_INSUFFICIENT_SPACE:
-                            mReason = "ERROR_INSUFFICIENT_SPACE";
-                            break;
-                        case DownloadManager.ERROR_TOO_MANY_REDIRECTS:
-                            mReason = "ERROR_TOO_MANY_REDIRECTS";
-                            break;
-                        case DownloadManager.ERROR_UNHANDLED_HTTP_CODE:
-                            mReason = "ERROR_UNHANDLED_HTTP_CODE";
-                            break;
-                        case DownloadManager.ERROR_UNKNOWN:
-                            mReason = "ERROR_UNKNOWN";
-                            break;
-                    }
-                    break;
-                case DownloadManager.STATUS_PAUSED:
-                    //statusText = "STATUS_PAUSED";
-                    mDownloadStatus = DownloadStatus.PAUSED;
-                    switch (reason) {
-                        case DownloadManager.PAUSED_QUEUED_FOR_WIFI:
-                            mReason = "PAUSED_QUEUED_FOR_WIFI";
-                            break;
-                        case DownloadManager.PAUSED_UNKNOWN:
-                            mReason = "PAUSED_UNKNOWN";
-                            break;
-                        case DownloadManager.PAUSED_WAITING_FOR_NETWORK:
-                            mReason = "PAUSED_WAITING_FOR_NETWORK";
-                            break;
-                        case DownloadManager.PAUSED_WAITING_TO_RETRY:
-                            mReason = "PAUSED_WAITING_TO_RETRY";
-                            break;
-                    }
-                    break;
-                case DownloadManager.STATUS_PENDING:
-                    //statusText = "STATUS_PENDING";
-                    mDownloadStatus = DownloadStatus.PENDING;
-                    mReason = null;
-                    break;
-                case DownloadManager.STATUS_RUNNING:
-                    //statusText = "STATUS_RUNNING";
-                    mDownloadStatus = DownloadStatus.RUNNING;
-                    int percent = (int) ((downloadedBytes * 100l) / totalBytes);
-                    mPercent = percent;
-                    mReason = null;
-                    break;
-                case DownloadManager.STATUS_SUCCESSFUL:
-                    //statusText = "STATUS_SUCCESSFUL";
-                    Log.i("id: "+mDownloadId+ " status: "+mDownloadStatus);
-                    mDownloadStatus = DownloadStatus.SUCCESSFUL;
-                    mReason = null;//"Filename:\n" + filename;
-                    if(!isFileExist()){
-                        mDownloadStatus = DownloadStatus.CANCELED;
-                        Log.i("id: "+mDownloadId+ " change status: "+mDownloadStatus);
-                    }
-                    break;
-                default:
-                    mDownloadStatus = DownloadStatus.NONE;
-                    mReason = null;
-            }
-        } else {
-            mDownloadStatus = DownloadStatus.CANCELED;
-        }
-        cursor.close();
-
-    }*/
-
     private boolean findDownloadHistory() {
         boolean isExist = false;
         if (mId == null)
@@ -513,7 +410,7 @@ public class Downloader {
         SQLiteDatabase db = mContext.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
         query = "SELECT * FROM "
                 + Constants.DOWNLOAD_DB_TABLE
-                + " WHERE field_id = '"
+                + " WHERE " + Strings.FIELD_ID + " = '"
                 + mId + "';";
 
         Cursor cur = null;
@@ -522,9 +419,9 @@ public class Downloader {
             cur.moveToFirst();
             if (cur != null && cur.getCount() > 0) {
                 isExist = true;
-                mId = cur.getString(cur.getColumnIndex("field_id"));
-                mUrl = cur.getString(cur.getColumnIndex("link"));
-                mDownloadId = cur.getLong(cur.getColumnIndex("download_id"));
+                mId = cur.getString(cur.getColumnIndex(Strings.FIELD_ID));
+                mUrl = cur.getString(cur.getColumnIndex(Strings.LINK));
+                mDownloadId = cur.getLong(cur.getColumnIndex(Strings.DOWNLOAD_ID));
             }
 
         } catch (Exception e) {

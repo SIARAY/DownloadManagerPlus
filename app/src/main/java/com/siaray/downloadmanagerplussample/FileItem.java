@@ -12,11 +12,11 @@ public class FileItem {
     private String id;
     private String link;
     private long downloadId;
-    private DownloadStatus downloadStatus=DownloadStatus.NONE;
+    private DownloadStatus downloadStatus = DownloadStatus.NONE;
     private String reasonMessage;
     private int percent;
     private Thread thread;
-private DownloadListener listener;
+    private DownloadListener listener;
 
     public FileItem() {
     }

@@ -73,16 +73,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_toRightOf="@+id/btn_action"
-            app:progress_reached_bar_height="1.5dp"
+            app:progress_reached_bar_height="3dp"
             app:progress_reached_color="#3498DB"
             app:progress_text_color="#3498DB"
             app:progress_text_offset="1dp"
             app:progress_text_size="10sp"
             app:progress_text_visibility="visible"
-            app:progress_unreached_bar_height="0.75dp"
+            app:progress_unreached_bar_height="3dp"
             app:progress_unreached_color="#CCCCCC" />
 
         <View

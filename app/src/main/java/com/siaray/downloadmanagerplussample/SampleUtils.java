@@ -33,7 +33,7 @@ public class SampleUtils {
             FileItem item = new FileItem();
             item.setId("" + i);
             String link = "";
-            switch (i % 5) {
+            switch (i % 12) {
                 case 0:
                     link = "https://s3-us-west-1.amazonaws.com/powr/defaults/image-slider2.jpg";
                     break;
@@ -44,8 +44,34 @@ public class SampleUtils {
                     link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
                     break;
                 case 3:
-                    link = "http://dl.pop-music.ir/music/1395/Dey/Mohammad%20Alizadeh%20-%20Goftam%20Naro%20(Teaser%20Album)%20480.mp4";
+                    link = "http://dl5.downloadha.com/hosein/NarmAfzaar/April%202017/Firefox.53.0.Final.Win.x64.en-US%20(www.Downloadha.com).zip";
                     break;
+                case 4:
+                    link = "http://hdwallpaperbackgrounds.net/wp-content/uploads/2016/07/4k-wallpaper-11.jpg";
+                    break;
+                case 5:
+                    link = "http://wallpaperpulse.com/img/2242184.jpg";
+                    break;
+                case 6:
+                    link = "http://free4kwallpaper.com/wp-content/uploads/2016/01/Beautiful-Girl-in-Nature-4K-Wallpaper.jpg";
+                    break;
+                case 7:
+                    link = "https://s-media-cache-ak0.pinimg.com/originals/5a/7a/f6/5a7af672ea944a471b1420e411743461.jpg";
+                    break;
+                case 8:
+                    link = "http://yesofcorsa.com/wp-content/uploads/2016/12/4k-Love-Wallpaper-HQ-1024x576.jpg";
+                    break;
+                case 9:
+                    link = "http://yesofcorsa.com/wp-content/uploads/2017/01/4K-Rain-Wallpaper-Download-1024x640.jpeg";
+                    break;
+                case 10:
+                    link = "http://zonewallpaper.net/wp-content/uploads/2016/11/Best-4K-Nature-Wallpaper-2016.jpeg";
+                    break;
+                case 11:
+                    link = "http://desktopwalls.net/wp-content/uploads/2015/09/" +
+                            "Fortress%20Town%20Lake%20Bridge%204K%20Ultra%20HD%20Desktop%20Wallpaper.jpg";
+                    break;
+
                 default:
                     link = "http://dl.pop-music.ir/music/1395/Dey/Saman%20Jalili%20-%20Tars.mp3";
             }
