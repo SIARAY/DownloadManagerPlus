@@ -12,11 +12,11 @@ Using faster and easier than Android Download Manager
      .setListener(listener)
      .setDownloadId(downloadId)
      .setDestinationDir(path, fileName)
-     .setNotificationTitle(notificationTitle));
+     .setNotificationTitle(notificationTitle);
      
     downloader.start();
 
-##### To view download status that has already started.
+##### To view download status and progress that has already started.
 
     downloader.showProgress();
 
