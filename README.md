@@ -2,7 +2,17 @@
 
 Using faster and easier than Android Download Manager
 
+## Screenshots
+
 ![Screenshot](https://gifyu.com/images/out20c239.gif)
+
+## Getting started
+
+##### Dependency
+
+    dependencies {
+        compile 'com.siaray:downloadmanagerplus:1.0.4'
+    }
 
 ## Usage
 
