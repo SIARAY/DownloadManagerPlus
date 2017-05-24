@@ -73,10 +73,10 @@ public class Utils {
 
     public static boolean deleteDownload(Context context, String id) {
 
-        SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+        SQLiteDatabase db = openDatabase(context);
         try {
 
-            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE " + Strings.FIELD_ID + "='" + id + "'");
+            db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE " + Strings.DOWNLOAD_PLUS_ID + "='" + id + "'");
         } catch (Exception e) {
             return false;
         } finally {
@@ -88,16 +88,16 @@ public class Utils {
     public static void createDBTables(Context context) {
         SQLiteDatabase db = null;
         try {
-            db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+            db = openDatabase(context);
 
             db.execSQL("CREATE TABLE IF NOT EXISTS ["
                     + Constants.DOWNLOAD_DB_TABLE
                     + "] ("
                     + "[" + Strings.ID + "] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-                    + "[" + Strings.FIELD_ID + "] NVARCHAR NOT NULL, "
+                    + "[" + Strings.DOWNLOAD_PLUS_ID + "] NVARCHAR NOT NULL, "
                     + "[" + Strings.LINK + "] NVARCHAR, "
                     + "[" + Strings.DOWNLOAD_ID + "] LONG, "
-                    + "UNIQUE(" + Strings.FIELD_ID + ") "
+                    + "UNIQUE(" + Strings.DOWNLOAD_PLUS_ID + ") "
                     + ");");
 
         } catch (Exception e) {
@@ -114,19 +114,19 @@ public class Utils {
             , String url
             , long downloadId) {
         if (id != null) {
-            SQLiteDatabase db = context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+            SQLiteDatabase db = openDatabase(context);
             try {
                 db.execSQL("INSERT OR REPLACE INTO "
                         + Constants.DOWNLOAD_DB_TABLE + " ( "
                         + Strings.ID + ", "
-                        + Strings.FIELD_ID + ", "
+                        + Strings.DOWNLOAD_PLUS_ID + ", "
                         + Strings.LINK + ", "
                         + Strings.DOWNLOAD_ID + " ) "
                         + "VALUES "
                         + "((SELECT id FROM "
                         + Constants.DOWNLOAD_DB_TABLE
                         + " WHERE "
-                        + Strings.FIELD_ID + " = '"
+                        + Strings.DOWNLOAD_PLUS_ID + " = '"
                         + id
                         + "'),'"
                         + id
@@ -187,4 +187,9 @@ public class Utils {
         int index = Constants.threadList.indexOf(thread);
         return index;
     }
+
+    public static SQLiteDatabase openDatabase(Context context) {
+        return context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+    }
+
 }

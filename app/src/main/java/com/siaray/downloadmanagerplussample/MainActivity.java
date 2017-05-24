@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         Button btnDownload = (Button) findViewById(R.id.button1);
         Button btnList = (Button) findViewById(R.id.button2);
-        btnList.setVisibility(View.VISIBLE);
         Button btnShowDownloads = (Button) findViewById(R.id.button3);
         btnDownload.setOnClickListener(this);
         btnList.setOnClickListener(this);
@@ -41,9 +40,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent = new Intent(MainActivity.this, NormalActivity.class);
                 break;
 
-            /*case R.id.button2:
-                intent = new Intent(MainActivity.this, ListActivity.class);
-                break;*/
+            case R.id.button2:
+                //notifyThis("Notification Title", "Notification Message");
+                //intent = new Intent(MainActivity.this, ListActivity.class);
+                break;
 
             case R.id.button3:
                 intent = new Intent();
@@ -56,5 +56,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //////////////////////////////////////////////////////////////////////////////
+    /*public void notifyThis(String title, String message) {
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
+        b.setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setTicker("{your tiny message}")
+                .setContentTitle(title)
+                .setContentText(message)
+                .setContentInfo("INFO");
+
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.notify(1, b.build());
+    }*/
 
 }

@@ -31,6 +31,7 @@ public class Downloader {
     private String mTitle;
     private String mFileName;
     private String mDestinationDir;
+    private String mDescription;
     private String mReason;
     private String mId = null;
     private String mLocalUri;
@@ -41,6 +42,10 @@ public class Downloader {
     private int mPercent;
     private int mDownloadedBytes;
     private int mTotalBytes;
+    private int mNotificationVisibility = DownloadManager
+            .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+    private int mNetworkTypes = DownloadManager.Request.NETWORK_WIFI
+            | DownloadManager.Request.NETWORK_MOBILE;
 
     public Downloader(Context mContext, DownloadManager downloadManager, String url) {
         this.mContext = mContext;
@@ -53,7 +58,7 @@ public class Downloader {
         mDownloadManager = downloadManager;
     }
 
-    public Downloader setDownloadId(String id) {
+    public Downloader setId(String id) {
         mId = id;
         Utils.createDBTables(mContext);
         return this;
@@ -74,9 +79,25 @@ public class Downloader {
         return this;
     }
 
+
+    public Downloader setDescription(String description) {
+        mDescription = description;
+        return this;
+    }
+
     public Downloader setDestinationDir(String destinationDir, String fileName) {
         mDestinationDir = destinationDir;
         mFileName = fileName;
+        return this;
+    }
+
+    public Downloader setNotificationVisibility(int visibility) {
+        mNotificationVisibility = visibility;
+        return this;
+    }
+
+    public Downloader setAllowedNetworkTypes(int networkTypes) {
+        mNetworkTypes = networkTypes;
         return this;
     }
 
@@ -118,14 +139,16 @@ public class Downloader {
         createDownloadDir();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
 
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
-                | DownloadManager.Request.NETWORK_MOBILE)
+        request.setAllowedNetworkTypes(mNetworkTypes)
                 .setTitle(mTitle)
                 .setAllowedOverRoaming(false)
                 .setVisibleInDownloadsUi(true)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                .setNotificationVisibility(mNotificationVisibility);
         if (mDestinationDir != null && mFileName != null)
             request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
+
+        if (mDescription != null && !mDescription.isEmpty())
+            request.setDescription(mDescription);
 
         mDownloadId = mDownloadManager.enqueue(request);
 
@@ -407,19 +430,19 @@ public class Downloader {
             return isExist;
 
         String query;
-        SQLiteDatabase db = mContext.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
+        SQLiteDatabase db = Utils.openDatabase(mContext);
         query = "SELECT * FROM "
                 + Constants.DOWNLOAD_DB_TABLE
-                + " WHERE " + Strings.FIELD_ID + " = '"
+                + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
                 + mId + "';";
 
         Cursor cur = null;
         try {
             cur = db.rawQuery(query, null);
-            cur.moveToFirst();
             if (cur != null && cur.getCount() > 0) {
+                cur.moveToFirst();
                 isExist = true;
-                mId = cur.getString(cur.getColumnIndex(Strings.FIELD_ID));
+                mId = cur.getString(cur.getColumnIndex(Strings.DOWNLOAD_PLUS_ID));
                 mUrl = cur.getString(cur.getColumnIndex(Strings.LINK));
                 mDownloadId = cur.getLong(cur.getColumnIndex(Strings.DOWNLOAD_ID));
             }
@@ -434,4 +457,60 @@ public class Downloader {
             return isExist;
         }
     }
+
+    public static String getId(Context context, long downloadId) {
+        String query;
+        SQLiteDatabase db = Utils.openDatabase(context);
+        query = "SELECT * FROM "
+                + Constants.DOWNLOAD_DB_TABLE
+                + " WHERE " + Strings.DOWNLOAD_ID + " = "
+                + downloadId + ";";
+        String downloadPlusId = null;
+        Cursor cur = null;
+        try {
+            cur = db.rawQuery(query, null);
+            if (cur != null && cur.getCount() > 0) {
+                cur.moveToFirst();
+                downloadPlusId = cur.getString(cur.getColumnIndex(Strings.DOWNLOAD_PLUS_ID));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cur != null)
+                cur.close();
+            if (db != null)
+                db.close();
+            return downloadPlusId;
+        }
+    }
+
+
+    public static long getDownloadId(Context context, String id) {
+        String query;
+        SQLiteDatabase db = Utils.openDatabase(context);
+        query = "SELECT * FROM "
+                + Constants.DOWNLOAD_DB_TABLE
+                + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
+                + id + "';";
+        long downloadId = -1;
+        Cursor cur = null;
+        try {
+            cur = db.rawQuery(query, null);
+            if (cur != null && cur.getCount() > 0) {
+                cur.moveToFirst();
+                downloadId = cur.getLong(cur.getColumnIndex(Strings.DOWNLOAD_ID));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cur != null)
+                cur.close();
+            if (db != null)
+                db.close();
+            return downloadId;
+        }
+    }
+
 }

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SEND_DOWNLOAD_COMPLETED_INTENTS" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +22,13 @@
         </activity>
         <activity android:name=".NormalActivity" />
         <!--<activity android:name=".ListActivity" />-->
+
+        <receiver android:name=".DownloadBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+            </intent-filter>
+        </receiver>
 
         <meta-data android:name="com.samsung.android.sdk.multiwindow.enable"
             android:value="true"/>

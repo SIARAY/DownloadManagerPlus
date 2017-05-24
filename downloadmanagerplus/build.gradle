@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 25
@@ -7,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 4
-        versionName "1.0.4"
+        versionCode 5
+        versionName "1.0.5"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -21,6 +22,12 @@ android {
     }
 }
 
+android {
+    lintOptions {
+        abortOnError false
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -30,4 +37,13 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+publish {
+    userOrg = 'siaray'
+    groupId = 'com.siaray'
+    artifactId = 'downloadmanagerplus'
+    uploadName = 'DownloadManagerPlus'
+    publishVersion = '1.0.4'
+    desc = 'Using faster and easier than Android Download Manager.'
+    website = 'https://github.com/SIARAY/DownloadManagerPlus'
+}
 
