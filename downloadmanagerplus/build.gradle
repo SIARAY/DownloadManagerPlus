@@ -42,7 +42,7 @@ publish {
     groupId = 'com.siaray'
     artifactId = 'downloadmanagerplus'
     uploadName = 'DownloadManagerPlus'
-    publishVersion = '1.0.4'
+    publishVersion = '1.0.5'
     desc = 'Using faster and easier than Android Download Manager.'
     website = 'https://github.com/SIARAY/DownloadManagerPlus'
 }

@@ -11,18 +11,22 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.0.4'
+        compile 'com.siaray:downloadmanagerplus:1.0.5'
     }
 
 ## Usage
 
 ##### To start the download.
 
-    Downloader downloader = new Downloader(context, downloadManager, url)
+    Downloader downloader = new Downloader(context, downloadManager)
+     .setUrl(url)
      .setListener(listener)
-     .setDownloadId(downloadId)
+     .setId(id)
      .setDestinationDir(path, fileName)
-     .setNotificationTitle(notificationTitle);
+     .setNotificationTitle(notificationTitle)
+     .setDescription(description)
+     .setNotificationVisibility(visibility)
+     .setAllowedNetworkTypes(networkTypes);
      
     downloader.start();
 
@@ -41,4 +45,12 @@ Using faster and easier than Android Download Manager
 ##### Delete the downloaded file.
 
     downloader.deleteFile(downloadId, deleteListener);
+
+##### Get download id.
+
+    Downloader.getDownloadId(context, id);
+
+##### Get download plus id.
+
+    Downloader.getId(context, downloadId);
 
