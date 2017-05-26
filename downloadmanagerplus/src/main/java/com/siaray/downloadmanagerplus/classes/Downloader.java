@@ -46,6 +46,7 @@ public class Downloader {
             .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
     private int mNetworkTypes = DownloadManager.Request.NETWORK_WIFI
             | DownloadManager.Request.NETWORK_MOBILE;
+    private boolean mScanningByMediaAllowed=false;
 
     public Downloader(Context mContext, DownloadManager downloadManager, String url) {
         this.mContext = mContext;
@@ -85,6 +86,11 @@ public class Downloader {
         return this;
     }
 
+    public Downloader setScanningByMediaScanner(Boolean scanningByMediaAllowed) {
+        mScanningByMediaAllowed = scanningByMediaAllowed;
+        return this;
+    }
+
     public Downloader setDestinationDir(String destinationDir, String fileName) {
         mDestinationDir = destinationDir;
         mFileName = fileName;
@@ -102,9 +108,7 @@ public class Downloader {
     }
 
     private boolean createDownloadDir() {
-        if (mDestinationDir != null)
-            return Environment.getExternalStoragePublicDirectory(mDestinationDir).mkdirs();
-        return false;
+        return mDestinationDir != null && Environment.getExternalStoragePublicDirectory(mDestinationDir).mkdirs();
     }
 
     public void start() {
@@ -144,6 +148,8 @@ public class Downloader {
                 .setAllowedOverRoaming(false)
                 .setVisibleInDownloadsUi(true)
                 .setNotificationVisibility(mNotificationVisibility);
+        if (mScanningByMediaAllowed)
+            request.allowScanningByMediaScanner();
         if (mDestinationDir != null && mFileName != null)
             request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
 
@@ -158,13 +164,10 @@ public class Downloader {
 
     private boolean isDownloadRunning() {
         mDownloadStatus = getStatus(mId);
-        if (mDownloadStatus == DownloadStatus.RUNNING
+        return mDownloadStatus == DownloadStatus.RUNNING
                 || mDownloadStatus == DownloadStatus.PENDING
                 || mDownloadStatus == DownloadStatus.PAUSED
-                || mDownloadStatus == DownloadStatus.SUCCESSFUL) {
-            return true;
-        }
-        return false;
+                || mDownloadStatus == DownloadStatus.SUCCESSFUL;
     }
 
     public void cancel(String id) {
@@ -217,8 +220,7 @@ public class Downloader {
         mId = id;
         findDownloadHistory();
         getDownloadStatusWithReason();
-        String path = mLocalUri;
-        return path;
+        return mLocalUri;
     }
 
     public void showProgress() {
@@ -398,8 +400,7 @@ public class Downloader {
                     //statusText = "STATUS_RUNNING";
                     mDownloadStatus = DownloadStatus.RUNNING;
                     if (mTotalBytes > 0) {
-                        int percent = (int) ((mDownloadedBytes * 100l) / mTotalBytes);
-                        mPercent = percent;
+                        mPercent = (int) ((mDownloadedBytes * 100L) / mTotalBytes);
                     }
                     mReason = null;
                     break;
@@ -420,7 +421,9 @@ public class Downloader {
         } else {
             mDownloadStatus = DownloadStatus.CANCELED;
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
 
     }
 
@@ -454,8 +457,8 @@ public class Downloader {
                 cur.close();
             if (db != null)
                 db.close();
-            return isExist;
         }
+        return isExist;
     }
 
     public static String getId(Context context, long downloadId) {
@@ -481,8 +484,8 @@ public class Downloader {
                 cur.close();
             if (db != null)
                 db.close();
-            return downloadPlusId;
         }
+        return downloadPlusId;
     }
 
 
@@ -509,8 +512,8 @@ public class Downloader {
                 cur.close();
             if (db != null)
                 db.close();
-            return downloadId;
         }
+        return downloadId;
     }
 
 }

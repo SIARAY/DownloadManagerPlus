@@ -35,6 +35,8 @@ public class NormalActivity extends AppCompatActivity {
                 .setListener(listener)
                 .setUrl(item.getLink())
                 .setId(item.getId())
+                .setDescription("description")
+                .setScanningByMediaScanner(true)
                 .setNotificationVisibility(DownloadManager
                         .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
@@ -176,13 +178,6 @@ public class NormalActivity extends AppCompatActivity {
     }
 
     private void showPercent(FileItem item, DownloadListener listener) {
-        /*new Downloader(NormalActivity.this, MainActivity.downloadManager, item.getLink())
-                .setListener(listener)
-                .setId(item.getId())
-                .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
-                        , Utils.getFileName(item.getLink()))
-                .setNotificationTitle(getFileShortName(Utils.getFileName(item.getLink())))*/
-        //Downloader downloader = getDownloader(item,listener);
         getDownloader(item, listener).showProgress();
     }
 
