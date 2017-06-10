@@ -2,6 +2,7 @@ package com.siaray.downloadmanagerplus.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
@@ -25,6 +26,7 @@ public class Utils {
     public static void openFile(Context context, String url) {
         if (url == null)
             return;
+        url=Uri.parse(url).getPath();
         Uri uri = Uri.fromFile(new File(url));
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -98,7 +100,7 @@ public class Utils {
                     + "] ("
                     + "[" + Strings.ID + "] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
                     + "[" + Strings.DOWNLOAD_PLUS_ID + "] NVARCHAR NOT NULL, "
-                    + "[" + Strings.LINK + "] NVARCHAR, "
+                    + "[" + Strings.URL + "] NVARCHAR, "
                     + "[" + Strings.DOWNLOAD_ID + "] LONG, "
                     + "UNIQUE(" + Strings.DOWNLOAD_PLUS_ID + ") "
                     + ");");
@@ -124,7 +126,7 @@ public class Utils {
                         + Constants.DOWNLOAD_DB_TABLE + " ( "
                         + Strings.ID + ", "
                         + Strings.DOWNLOAD_PLUS_ID + ", "
-                        + Strings.LINK + ", "
+                        + Strings.URL + ", "
                         + Strings.DOWNLOAD_ID + " ) "
                         + "VALUES "
                         + "((SELECT id FROM "
@@ -192,4 +194,23 @@ public class Utils {
         return context.openOrCreateDatabase(Constants.DOWNLOAD_DB_NAME, Context.MODE_PRIVATE, null);
     }
 
+
+    public static int getColumnInt(Cursor cursor, String columnName) {
+        return cursor.getInt(cursor
+                .getColumnIndex(columnName));
+    }
+
+    public static long getColumnLong(Cursor cursor, String columnName) {
+        return cursor.getLong(cursor
+                .getColumnIndex(columnName));
+    }
+
+    public static String getColumnString(Cursor cursor, String columnName) {
+        return cursor.getString(cursor
+                .getColumnIndex(columnName));
+    }
+
+    public static boolean isFileExist(String path) {
+        return (new File(path).exists());
+    }
 }

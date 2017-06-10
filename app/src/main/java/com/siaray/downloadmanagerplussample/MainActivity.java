@@ -7,6 +7,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.siaray.downloadmanagerplus.classes.Downloader;
+import com.siaray.downloadmanagerplus.model.DownloadItem;
+import com.siaray.downloadmanagerplus.utils.Utils;
+
+import java.util.List;
+
+import static com.siaray.downloadmanagerplus.utils.Log.printItems;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -41,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
+                List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext()
+                        ,downloadManager);
+                if(list.size()>0) {
+                    Utils.openFile(MainActivity.this, list.get(0).getLocalUri());
+                    Toast.makeText(this, printItems(list.get(0)), Toast.LENGTH_LONG).show();
+                }
                 //notifyThis("Notification Title", "Notification Message");
                 //intent = new Intent(MainActivity.this, ListActivity.class);
                 break;

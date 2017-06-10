@@ -1,65 +1,70 @@
 package com.siaray.downloadmanagerplussample;
 
 
-import com.siaray.downloadmanagerplus.enums.DownloadStatus;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import com.siaray.downloadmanagerplus.model.DownloadItem;
 
 /**
  * Created by Siamak on 07/01/2017.
  */
-public class FileItem {
+public class FileItem extends DownloadItem {
 
-    private String id;
-    private String link;
-    private long downloadId;
-    private DownloadStatus downloadStatus = DownloadStatus.NONE;
+    //private String id;
+    //private String link;
+    //private long downloadId;
+    //private DownloadStatus downloadStatus = DownloadStatus.NONE;
     private String reasonMessage;
-    private int percent;
-    private Thread thread;
+    //private int percent;
+    //private Thread thread;
     private DownloadListener listener;
 
     public FileItem() {
+        super();
     }
 
-    public String getId() {
+    public FileItem(DownloadItem downloadItem) {
+        super(downloadItem);
+    }
+
+/*    public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
+    }*/
 
-    public String getLink() {
+    /*public String getLink() {
         return link;
     }
 
     public void setLink(String link) {
         this.link = link;
-    }
+    }*/
 
-    public long getDownloadId() {
+ /*   public long getDownloadId() {
         return downloadId;
     }
 
     public void setDownloadId(long downloadId) {
         this.downloadId = downloadId;
-    }
+    }*/
 
-    public DownloadStatus getDownloadStatus() {
+    /*public DownloadStatus getDownloadStatus() {
         return downloadStatus;
     }
 
     public void setDownloadStatus(DownloadStatus downloadStatus) {
         this.downloadStatus = downloadStatus;
-    }
+    }*/
 
-    public int getPercent() {
+    /*public int getPercent() {
         return percent;
     }
 
     public void setPercent(int percent) {
         this.percent = percent;
-    }
+    }*/
 
     public String getReasonMessage() {
         return reasonMessage;
@@ -69,12 +74,12 @@ public class FileItem {
         this.reasonMessage = reasonMessage;
     }
 
-    public void startDownload(Runnable runnable) {
+    /*public void startDownload(Runnable runnable) {
         if (thread == null || !thread.isAlive()) {
             thread = new Thread(runnable);
             thread.start();
         }
-    }
+    }*/
 
     public DownloadListener getListener() {
         return listener;

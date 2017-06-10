@@ -4,8 +4,9 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/appBackground"
     android:gravity="center"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -15,30 +16,34 @@
 
     <Button
         android:id="@+id/button1"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:text="Download" />
+
     <Button
         android:id="@+id/button2"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"
+        android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="Test" />
+        android:text="Get first download item in list"
+        android:visibility="visible" />
 
     <Button
         android:id="@+id/button3"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="Show Downloads" />
 

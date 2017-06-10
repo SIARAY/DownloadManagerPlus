@@ -13,8 +13,9 @@ import android.widget.Toast;
 
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.siaray.downloadmanagerplus.classes.Downloader;
+import com.siaray.downloadmanagerplus.enums.DownloadReason;
 import com.siaray.downloadmanagerplus.enums.DownloadStatus;
-import com.siaray.downloadmanagerplus.enums.Result;
+import com.siaray.downloadmanagerplus.enums.Errors;
 import com.siaray.downloadmanagerplus.interfaces.ActionListener;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import com.siaray.downloadmanagerplus.utils.Log;
@@ -33,7 +34,7 @@ public class NormalActivity extends AppCompatActivity {
     private Downloader getDownloader(FileItem item, DownloadListener listener) {
         return new Downloader(NormalActivity.this, MainActivity.downloadManager)
                 .setListener(listener)
-                .setUrl(item.getLink())
+                .setUrl(item.getUri())
                 .setId(item.getId())
                 .setDescription("description")
                 .setScanningByMediaScanner(true)
@@ -42,8 +43,8 @@ public class NormalActivity extends AppCompatActivity {
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
                         | DownloadManager.Request.NETWORK_MOBILE)
                 .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
-                        , Utils.getFileName(item.getLink()))
-                .setNotificationTitle(getFileShortName(Utils.getFileName(item.getLink())));
+                        , Utils.getFileName(item.getUri()))
+                .setNotificationTitle(getFileShortName(Utils.getFileName(item.getUri())));
     }
 
     private void inflateUi() {
@@ -71,16 +72,16 @@ public class NormalActivity extends AppCompatActivity {
         TextView tvName = (TextView) view.findViewById(R.id.tv_name);
         final NumberProgressBar numberProgressBar = (NumberProgressBar) view.findViewById(R.id.progressbar);
 
-        tvName.setText(Utils.getFileName(item.getLink()));
+        tvName.setText(Utils.getFileName(item.getUri()));
 
         final ActionListener deleteListener = getDeleteListener(ivAction, btnAction, numberProgressBar);
-        final DownloadListener listener = getDownloadListener(ivAction, numberProgressBar);
-
+        //final DownloadListener listener = getDownloadListener(ivAction, numberProgressBar);
+        item.setListener(getDownloadListener(ivAction, numberProgressBar));
         btnAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                final Downloader downloader = getDownloader(item, listener);
+                final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
                 if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING
                         || downloader.getStatus(item.getId()) == DownloadStatus.PAUSED
                         || downloader.getStatus(item.getId()) == DownloadStatus.PENDING)
@@ -91,13 +92,13 @@ public class NormalActivity extends AppCompatActivity {
                     downloader.start();
             }
         });
-        showPercent(item, listener);
+        showPercent(item, item.getListener());
 
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Downloader downloader = new Downloader(NormalActivity.this, MainActivity.downloadManager, item.getLink())
-                        .setListener(listener);
+                Downloader downloader = new Downloader(NormalActivity.this, MainActivity.downloadManager, item.getUri())
+                        .setListener(item.getListener());
 
                 downloader.deleteFile(item.getId(), deleteListener);
             }
@@ -109,15 +110,15 @@ public class NormalActivity extends AppCompatActivity {
     private ActionListener getDeleteListener(final ImageView ivAction, final ViewGroup btnDelete, final NumberProgressBar numberProgressBar) {
         return new ActionListener() {
             @Override
-            public void onSuccess(String message) {
+            public void onSuccess() {
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
-                Toast.makeText(NormalActivity.this, "" + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(NormalActivity.this, "Deleted" , Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(String message) {
-                Toast.makeText(NormalActivity.this, "" + message, Toast.LENGTH_SHORT).show();
+            public void onFailure(Errors error) {
+                Toast.makeText(NormalActivity.this, "" + error, Toast.LENGTH_SHORT).show();
 
             }
         };
@@ -126,54 +127,72 @@ public class NormalActivity extends AppCompatActivity {
     private DownloadListener getDownloadListener(final ImageView ivAction
             , final NumberProgressBar numberProgressBar) {
         return new DownloadListener() {
+            DownloadStatus lastStatus = DownloadStatus.NONE;
+
             @Override
-            public void onComplete(String msg) {
-                Log.i("onComplete called: " + msg);
+            public void onComplete() {
+                Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
                 numberProgressBar.setProgress(100);
+                lastStatus = DownloadStatus.SUCCESSFUL;
             }
 
             @Override
-            public void onPause(String msg, String reason) {
-                Log.i("onPause called: " + msg);
-
+            public void onPause(int percent, DownloadReason reason) {
+                if (lastStatus != DownloadStatus.PAUSED) {
+                    Log.i("onPause - percent: " + percent
+                            + " lastStatus:" + lastStatus
+                            + " reason:" + reason);
+                    ivAction.setImageResource(R.mipmap.ic_cancel);
+                    numberProgressBar.setProgress(percent);
+                }
+                lastStatus = DownloadStatus.PAUSED;
             }
 
             @Override
-            public void onPending(String msg) {
-                Log.i("onPending called: " + msg);
-
+            public void onPending(int percent) {
+                if (lastStatus != DownloadStatus.PENDING) {
+                    Log.i("onPending - lastStatus:" + lastStatus);
+                    ivAction.setImageResource(R.mipmap.ic_cancel);
+                    numberProgressBar.setProgress(percent);
+                }
+                lastStatus = DownloadStatus.PENDING;
             }
 
             @Override
-            public void onFail(String msg, String reason) {
-                Log.i("onFail called: " + msg);
+            public void onFail(int percent, DownloadReason reason) {
+                Log.i("onFail - percent: " + percent
+                        + " lastStatus:" + lastStatus
+                        + " reason:" + reason);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
+                lastStatus = DownloadStatus.FAILED;
 
             }
 
             @Override
-            public void onCancel(String msg) {
-                Log.i("onCancel called: " + msg);
+            public void onCancel() {
+                Log.i("onCancel");
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
+                lastStatus = DownloadStatus.CANCELED;
             }
 
             @Override
             public void onRunning(int percent, int mTotalBytes, int mDownloadedBytes) {
                 ivAction.setImageResource(R.mipmap.ic_cancel);
                 numberProgressBar.setProgress(percent);
+                lastStatus = DownloadStatus.RUNNING;
             }
 
-            @Override
+            /*@Override
             public void onMessage(Result result, String msg) {
                 if (result == Result.ERROR) {
                     ivAction.setImageResource(R.mipmap.ic_start);
                     numberProgressBar.setProgress(0);
                 }
                 Toast.makeText(NormalActivity.this, "" + msg, Toast.LENGTH_SHORT).show();
-            }
+            }*/
         };
     }
 

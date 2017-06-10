@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.0.6'
+        compile 'com.siaray:downloadmanagerplus:1.1.0'
     }
 
 ## Usage
@@ -53,4 +53,12 @@ Using faster and easier than Android Download Manager
 ##### Get download plus id.
 
     Downloader.getId(context, downloadId);
+
+##### Get download item.
+
+    Downloader.getDownloadItem(context, downloadManager, id);
+
+##### Get downloads list.
+
+    Downloader.getDownloadsList(context, downloadManager);
 

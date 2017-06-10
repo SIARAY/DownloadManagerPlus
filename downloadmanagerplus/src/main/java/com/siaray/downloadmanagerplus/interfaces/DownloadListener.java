@@ -1,6 +1,6 @@
 package com.siaray.downloadmanagerplus.interfaces;
 
-import com.siaray.downloadmanagerplus.enums.Result;
+import com.siaray.downloadmanagerplus.enums.DownloadReason;
 
 /**
  * Created by Siamak on 16/01/2017.
@@ -8,18 +8,18 @@ import com.siaray.downloadmanagerplus.enums.Result;
 
 public interface DownloadListener {
 
-    void onComplete(String msg);
+    void onComplete();
 
-    void onPause(String msg, String reason);
+    void onPause(int percent, DownloadReason reason);
 
-    void onPending(String msg);
+    void onPending(int percent);
 
-    void onFail(String msg, String reason);
+    void onFail(int percent, DownloadReason reason);
 
-    void onCancel(String msg);
+    void onCancel();
 
     void onRunning(int percent, int mTotalBytes, int mDownloadedBytes);
 
-    void onMessage(Result results, String msg);
+    //void onMessage(Result results, String msg);
 
 }

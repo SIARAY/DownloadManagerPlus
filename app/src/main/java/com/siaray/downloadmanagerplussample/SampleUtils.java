@@ -13,15 +13,15 @@ public class SampleUtils {
         if(number==1) {
             item.setId("id1245");
             String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
-            item.setLink(link);
+            item.setUri(link);
         }else if(number==2){
             item.setId("id1249");
-            String link = "http://as3.cdn.asset.aparat.com/aparat-video/6a264ee6d22be3ab6a00fd3a774316424062813-360p__64493.mp4";
-            item.setLink(link);
+            String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
+            item.setUri(link);
         }else{
             item.setId("id1280");
             String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
-            item.setLink(link);
+            item.setUri(link);
         }
         return item;
     }
@@ -75,7 +75,7 @@ public class SampleUtils {
                 default:
                     link = "http://dl.pop-music.ir/music/1395/Dey/Saman%20Jalili%20-%20Tars.mp3";
             }
-            item.setLink(link);
+            item.setUri(link);
             list.add(item);
         }
     }
