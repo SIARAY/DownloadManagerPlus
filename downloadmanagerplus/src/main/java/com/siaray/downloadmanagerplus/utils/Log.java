@@ -9,11 +9,11 @@ import java.lang.reflect.Field;
 public class Log {
 
     public static <T> void i(T msg) {
-        android.util.Log.i("DownloadManagerPlus", "" + msg);
+        //android.util.Log.i("DownloadManagerPlus", "" + msg);
     }
 
     public static String printItems(Object obj) {
-        Log.i("*** Object Values ***");
+        Log.i("*** " + obj.getClass().getSimpleName() + " Values ***");
         String result = "";
         for (Field field : obj.getClass().getDeclaredFields()) {
             field.setAccessible(true);

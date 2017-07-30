@@ -9,14 +9,9 @@ import com.siaray.downloadmanagerplus.model.DownloadItem;
  */
 public class FileItem extends DownloadItem {
 
-    //private String id;
-    //private String link;
-    //private long downloadId;
-    //private DownloadStatus downloadStatus = DownloadStatus.NONE;
     private String reasonMessage;
-    //private int percent;
-    //private Thread thread;
     private DownloadListener listener;
+    private int fileSize = -1;
 
     public FileItem() {
         super();
@@ -26,46 +21,6 @@ public class FileItem extends DownloadItem {
         super(downloadItem);
     }
 
-/*    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }*/
-
-    /*public String getLink() {
-        return link;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
-    }*/
-
- /*   public long getDownloadId() {
-        return downloadId;
-    }
-
-    public void setDownloadId(long downloadId) {
-        this.downloadId = downloadId;
-    }*/
-
-    /*public DownloadStatus getDownloadStatus() {
-        return downloadStatus;
-    }
-
-    public void setDownloadStatus(DownloadStatus downloadStatus) {
-        this.downloadStatus = downloadStatus;
-    }*/
-
-    /*public int getPercent() {
-        return percent;
-    }
-
-    public void setPercent(int percent) {
-        this.percent = percent;
-    }*/
-
     public String getReasonMessage() {
         return reasonMessage;
     }
@@ -74,18 +29,19 @@ public class FileItem extends DownloadItem {
         this.reasonMessage = reasonMessage;
     }
 
-    /*public void startDownload(Runnable runnable) {
-        if (thread == null || !thread.isAlive()) {
-            thread = new Thread(runnable);
-            thread.start();
-        }
-    }*/
-
     public DownloadListener getListener() {
         return listener;
     }
 
     public void setListener(DownloadListener listener) {
         this.listener = listener;
+    }
+
+    public int getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(int fileSize) {
+        this.fileSize = fileSize;
     }
 }

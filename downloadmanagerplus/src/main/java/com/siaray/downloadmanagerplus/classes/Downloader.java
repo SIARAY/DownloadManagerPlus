@@ -6,8 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
@@ -18,6 +20,7 @@ import com.siaray.downloadmanagerplus.interfaces.ActionListener;
 import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import com.siaray.downloadmanagerplus.model.DownloadItem;
 import com.siaray.downloadmanagerplus.utils.Constants;
+import com.siaray.downloadmanagerplus.utils.Log;
 import com.siaray.downloadmanagerplus.utils.Strings;
 import com.siaray.downloadmanagerplus.utils.Utils;
 
@@ -52,6 +55,9 @@ public class Downloader {
     private int mNetworkTypes = DownloadManager.Request.NETWORK_WIFI
             | DownloadManager.Request.NETWORK_MOBILE;
     private boolean mScanningByMediaAllowed = false;
+    private boolean mRoamingAllowed = false;
+    private boolean mVisibleInDownloadsUi = true;
+    private boolean mMeteredAllowed = false;
 
     public Downloader(Context mContext, DownloadManager downloadManager, String url) {
         this.mContext = mContext;
@@ -112,6 +118,22 @@ public class Downloader {
         return this;
     }
 
+    public Downloader setAllowedOverRoaming(boolean allowed) {
+        mRoamingAllowed = allowed;
+        return this;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    public Downloader setAllowedOverMetered(boolean allowed) {
+        mMeteredAllowed = allowed;
+        return this;
+    }
+
+    public Downloader setVisibleInDownloadsUi(boolean isVisible) {
+        mVisibleInDownloadsUi = isVisible;
+        return this;
+    }
+
     private boolean createDownloadDir() {
         return mDestinationDir != null && Environment.getExternalStoragePublicDirectory(mDestinationDir).mkdirs();
     }
@@ -120,39 +142,40 @@ public class Downloader {
         if (isThereAnError()) {
             return;
         }
-        forcedDownload();
+        startDownload();
     }
 
     private boolean isThereAnError() {
         if (TextUtils.isEmpty(mUrl) || !URLUtil.isValidUrl(mUrl)) {
-            mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID);
+            mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID, mTotalBytes, mDownloadedBytes);
             return true;
         }
         if (TextUtils.isEmpty(mId)) {
-            mListener.onFail(mPercent, DownloadReason.ID_NOT_FOUND);
+            mListener.onFail(mPercent, DownloadReason.ID_NOT_FOUND, mTotalBytes, mDownloadedBytes);
             return true;
         }
         if (isDownloadRunning()) {
             if (mListener != null) {
                 if (mDownloadStatus == DownloadStatus.SUCCESSFUL)
-                    mListener.onComplete();
+                    mListener.onComplete(mTotalBytes);
                 else
-                    mListener.onFail(mPercent, DownloadReason.DOWNLOAD_IN_PROGRESS);
+                    mListener.onFail(mPercent, DownloadReason.DOWNLOAD_IN_PROGRESS, mTotalBytes, mDownloadedBytes);
             }
             return true;
         }
         return false;
     }
 
-    public void forcedDownload() {
+    private void startDownload() {
         createDownloadDir();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
 
         request.setAllowedNetworkTypes(mNetworkTypes)
                 .setTitle(mTitle)
-                .setAllowedOverRoaming(false)
-                .setVisibleInDownloadsUi(true)
+                .setAllowedOverRoaming(mRoamingAllowed)
+                .setVisibleInDownloadsUi(mVisibleInDownloadsUi)
                 .setNotificationVisibility(mNotificationVisibility);
+
         if (mScanningByMediaAllowed)
             request.allowScanningByMediaScanner();
         if (mDestinationDir != null && mFileName != null)
@@ -160,6 +183,11 @@ public class Downloader {
 
         if (mDescription != null && !mDescription.isEmpty())
             request.setDescription(mDescription);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            request.setAllowedOverMetered(mMeteredAllowed);
+        }
+
         cancel(mId);
         mDownloadId = mDownloadManager.enqueue(request);
 
@@ -185,22 +213,25 @@ public class Downloader {
     }
 
     public boolean deleteFile(String id, ActionListener listener) {
-        String filePath = getDownloadedFilePath(id);
-        if (filePath != null) {
-            File downloadedFile = new File(filePath);
-            if (downloadedFile.exists()) {
-                boolean deleted = downloadedFile.delete();
-                if (deleted) {
-                    cancel(id);
-                    listener.onSuccess();
-                    return true;
+        String fileUri = getDownloadedFilePath(id);
+        if (fileUri != null) {
+            String filePath = Uri.parse(fileUri).getPath();
+            if (filePath != null) {
+                File downloadedFile = new File(filePath);
+                if (downloadedFile.exists()) {
+                    boolean deleted = downloadedFile.delete();
+                    if (deleted) {
+                        cancel(id);
+                        listener.onSuccess();
+                        return true;
+                    } else {
+                        listener.onFailure(Errors.CAN_NOT_DELETE_FILE);
+                        return false;
+                    }
                 } else {
-                    listener.onFailure(Errors.CAN_NOT_DELETE_FILE);
+                    listener.onFailure(Errors.FILE_NOT_FOUND);
                     return false;
                 }
-            } else {
-                listener.onFailure(Errors.FILE_NOT_FOUND);
-                return false;
             }
         }
         listener.onFailure(Errors.FILE_PATH_NOT_FOUND);
@@ -245,20 +276,20 @@ public class Downloader {
                                     //String message = statusMessage();
                                     switch (mDownloadStatus) {
                                         case SUCCESSFUL:
-                                            mListener.onComplete();
+                                            mListener.onComplete(mTotalBytes);
                                             break;
                                         case PAUSED:
-                                            mListener.onPause(mPercent, mReason);
+                                            mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
                                             break;
                                         case PENDING:
-                                            mListener.onPending(mPercent);
+                                            mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
                                             break;
                                         case FAILED:
-                                            mListener.onFail(mPercent, mReason);
+                                            mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
                                             break;
                                         case CANCELED:
                                             continuous[0] = false;
-                                            mListener.onCancel();
+                                            mListener.onCancel(mTotalBytes, mDownloadedBytes);
                                             break;
                                         default://Running
                                             mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
@@ -309,7 +340,8 @@ public class Downloader {
                     , DownloadManager.COLUMN_REASON);
             mReason = getDownloadReason(reason);
             mLocalUri = Utils.getColumnString(cursor
-                    , DownloadManager.COLUMN_LOCAL_FILENAME);
+                    , DownloadManager.COLUMN_LOCAL_URI);
+            //, DownloadManager.COLUMN_LOCAL_FILENAME);
 
             switch (currentDownloadStatus) {
                 case DownloadManager.STATUS_FAILED:
@@ -446,6 +478,7 @@ public class Downloader {
             cursor.moveToFirst();
             do {
                 DownloadItem downloadItem = fetchDownloadItem(context, cursor);
+                Log.printItems(downloadItem);
                 if (downloadItem.getId() == null)
                     downloadManager.remove(downloadItem.getDownloadId());
                 else

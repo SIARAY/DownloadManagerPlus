@@ -36,7 +36,7 @@ public class DownloadBroadcastReceiver extends BroadcastReceiver {
         long downloadId = intent.getLongExtra(
                 DownloadManager.EXTRA_DOWNLOAD_ID, 0);
         String id = Downloader.getId(context, downloadId);
-        DownloadItem downloadItem = Downloader.getDownloadItem(context, MainActivity.downloadManager, id);
+        DownloadItem downloadItem = Downloader.getDownloadItem(context, AppController.downloadManager, id);
         if (downloadItem != null && downloadItem.getPercent() == 100) {
             Log.i("Download Completed. Download id: " + downloadId);
             Log.i("Download plus id: " + id);

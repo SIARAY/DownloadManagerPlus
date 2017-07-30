@@ -1,7 +1,6 @@
 package com.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,16 +10,14 @@ import android.widget.Toast;
 
 import com.siaray.downloadmanagerplus.classes.Downloader;
 import com.siaray.downloadmanagerplus.model.DownloadItem;
+import com.siaray.downloadmanagerplus.utils.Log;
 import com.siaray.downloadmanagerplus.utils.Utils;
 
 import java.util.List;
 
-import static com.siaray.downloadmanagerplus.utils.Log.printItems;
-
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static DownloadManager downloadManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initUi() {
-        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         Button btnDownload = (Button) findViewById(R.id.button1);
         Button btnList = (Button) findViewById(R.id.button2);
         Button btnShowDownloads = (Button) findViewById(R.id.button3);
@@ -51,10 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.button2:
                 List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext()
-                        ,downloadManager);
+                        ,AppController.downloadManager);
                 if(list.size()>0) {
                     Utils.openFile(MainActivity.this, list.get(0).getLocalUri());
-                    Toast.makeText(this, printItems(list.get(0)), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, Log.printItems(list.get(0)), Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(this, "Download list is empty.", Toast.LENGTH_LONG).show();
                 }
                 //notifyThis("Notification Title", "Notification Message");
                 //intent = new Intent(MainActivity.this, ListActivity.class);

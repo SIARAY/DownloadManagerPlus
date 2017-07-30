@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import java.io.File;
+import java.text.DecimalFormat;
 
 /**
  * Created by Siamak on 08/01/2017.
@@ -26,7 +27,7 @@ public class Utils {
     public static void openFile(Context context, String url) {
         if (url == null)
             return;
-        url=Uri.parse(url).getPath();
+        url = Uri.parse(url).getPath();
         Uri uri = Uri.fromFile(new File(url));
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -210,7 +211,40 @@ public class Utils {
                 .getColumnIndex(columnName));
     }
 
-    public static boolean isFileExist(String path) {
-        return (new File(path).exists());
+    public static boolean isFileExist(String url) {
+        url = Uri.parse(url).getPath();
+        return (new File(url).exists());
+    }
+
+    /*public static long getDownloadFileSize(final String downloadLink) {
+        new AsyncTask<Void,Integer,Void>() {
+
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                long fileSize = -1;
+                try {
+                    URL url = new URL(downloadLink);
+                    URLConnection urlConnection = url.openConnection();
+                    urlConnection.connect();
+                    fileSize = urlConnection.getContentLength();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }.execute();
+
+    }*/
+
+    public static String readableFileSize(long size) {
+        if(size < 0) return "";
+        if(size == 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }

@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="80dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
@@ -25,17 +25,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:padding="24dp"
+                android:padding="26dp"
                 android:src="@mipmap/ic_start" />
 
             <com.pnikosis.materialishprogress.ProgressWheel
                 android:id="@+id/progress_wheel"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerInParent="true"
                 android:visibility="gone"
-                app:matProg_barColor="#5588FF"
+                app:matProg_barColor="#ffffff"
+                app:matProg_barWidth="3dp"
+                app:matProg_spinSpeed="0.5"
                 app:matProg_fillRadius="true"
                 app:matProg_progressIndeterminate="true" />
 
@@ -54,6 +55,21 @@
             android:layout_marginTop="4dp"
             android:textColor="#000"
             android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/tv_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btn_delete"
+            android:layout_toRightOf="@+id/btn_action"
+            android:layout_below="@+id/tv_name"
+            android:gravity="left"
+            android:maxLines="1"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="0dp"
+            android:textColor="#888"
+            android:textSize="10dp" />
 
         <RelativeLayout
             android:id="@+id/btn_delete"

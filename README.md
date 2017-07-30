@@ -4,14 +4,14 @@ Using faster and easier than Android Download Manager
 
 ## Screenshots
 
-![Screenshot](https://gifyu.com/images/out20c239.gif)
+![Screenshot](https://gifyu.com/images/downloadmanagerplus-v1.1.1.gif)
 
 ## Getting started
 
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.1.0'
+        compile 'com.siaray:downloadmanagerplus:1.1.1'
     }
 
 ## Usage
@@ -22,6 +22,9 @@ Using faster and easier than Android Download Manager
      .setUrl(url)
      .setListener(listener)
      .setId(id)
+     .setAllowedOverRoaming(false)
+     .setAllowedOverMetered(false) //Api 16 and higher
+     .setVisibleInDownloadsUi(true)
      .setDestinationDir(path, fileName)
      .setNotificationTitle(notificationTitle)
      .setDescription(description)

@@ -7,9 +7,9 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 7
-        versionName "1.1.0"
+        targetSdkVersion 22
+        versionCode 8
+        versionName "1.1.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -30,7 +30,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 }
 
 publish {
@@ -38,7 +38,7 @@ publish {
     groupId = 'com.siaray'
     artifactId = 'downloadmanagerplus'
     uploadName = 'DownloadManagerPlus'
-    publishVersion = '1.1.0'
+    publishVersion = '1.1.1'
     desc = 'Using faster and easier than Android Download Manager.'
     website = 'https://github.com/SIARAY/DownloadManagerPlus'
 }

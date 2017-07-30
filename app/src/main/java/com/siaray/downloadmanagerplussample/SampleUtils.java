@@ -1,5 +1,11 @@
 package com.siaray.downloadmanagerplussample;
 
+import android.content.Context;
+import android.os.AsyncTask;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -10,15 +16,15 @@ public class SampleUtils {
     public static FileItem getDownloadItem(int number) {
         FileItem item = new FileItem();
 
-        if(number==1) {
+        if (number == 1) {
             item.setId("id1245");
             String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
             item.setUri(link);
-        }else if(number==2){
+        } else if (number == 2) {
             item.setId("id1249");
             String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
             item.setUri(link);
-        }else{
+        } else {
             item.setId("id1280");
             String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
             item.setUri(link);
@@ -26,8 +32,6 @@ public class SampleUtils {
         return item;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////
     public static void getFileList(List<FileItem> list, int number) {
         for (int i = 0; i < number; i++) {
             FileItem item = new FileItem();
@@ -80,8 +84,48 @@ public class SampleUtils {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    public static String getFileShortName(String name) {
+        if (name.length() > 10) {
+            name = name.substring(0, 5) + ".." + name.substring(name.length() - 4, name.length());
+        }
+        return name;
+    }
+
     /*public static String getFileName(String url) {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
     }*/
+
+    public static void setFileSize(final Context context, final FileItem item) {
+        new AsyncTask<String, Integer, Integer>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Integer doInBackground(String... params) {
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL(item.getUri());
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("HEAD");
+                    connection.setConnectTimeout(3000);
+                    connection.getInputStream();
+                    return connection.getContentLength();
+                } catch (IOException e) {
+                    return -1;
+                } finally {
+                    if (connection != null)
+                        connection.disconnect();
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Integer i) {
+                item.setFileSize(i);
+                super.onPostExecute(i);
+            }
+        }.execute();
+    }
+
 }
