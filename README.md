@@ -22,9 +22,9 @@ Using faster and easier than Android Download Manager
      .setUrl(url)
      .setListener(listener)
      .setId(id)
-     .setAllowedOverRoaming(false)
-     .setAllowedOverMetered(false) //Api 16 and higher
-     .setVisibleInDownloadsUi(true)
+     .setAllowedOverRoaming(roamingAllowed)
+     .setAllowedOverMetered(meteredAllowed) //Api 16 and higher
+     .setVisibleInDownloadsUi(isVisible)
      .setDestinationDir(path, fileName)
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
