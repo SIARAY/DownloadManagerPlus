@@ -31,6 +31,7 @@ import java.util.List;
 
 /**
  * Created by Siamak on 19/01/2017.
+ * https://github.com/SIARAY/DownloadManagerPlus
  */
 
 public class Downloader {
@@ -59,13 +60,17 @@ public class Downloader {
     private boolean mVisibleInDownloadsUi = true;
     private boolean mMeteredAllowed = false;
 
-    public Downloader(Context mContext, DownloadManager downloadManager, String url) {
+    /*private Downloader(Context mContext, DownloadManager downloadManager, String url) {
         this.mContext = mContext;
         mDownloadManager = downloadManager;
         mUrl = url;
+    }*/
+
+    public static Downloader getInstance(Context mContext, DownloadManager downloadManager){
+        return (new Downloader(mContext,downloadManager));
     }
 
-    public Downloader(Context mContext, DownloadManager downloadManager) {
+    private Downloader(Context mContext, DownloadManager downloadManager) {
         this.mContext = mContext;
         mDownloadManager = downloadManager;
     }
@@ -380,34 +385,33 @@ public class Downloader {
 
     private boolean findDownloadHistory() {
         boolean existed = false;
-        if (mId == null)
-            return existed;
+        if (mId != null) {
+            String query;
+            SQLiteDatabase db = Utils.openDatabase(mContext);
+            query = "SELECT * FROM "
+                    + Constants.DOWNLOAD_DB_TABLE
+                    + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
+                    + mId + "';";
 
-        String query;
-        SQLiteDatabase db = Utils.openDatabase(mContext);
-        query = "SELECT * FROM "
-                + Constants.DOWNLOAD_DB_TABLE
-                + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
-                + mId + "';";
+            Cursor cur = null;
+            try {
+                cur = db.rawQuery(query, null);
+                if (cur != null && cur.getCount() > 0) {
+                    cur.moveToFirst();
+                    existed = true;
+                    mId = Utils.getColumnString(cur, Strings.DOWNLOAD_PLUS_ID);
+                    mUrl = Utils.getColumnString(cur, Strings.URL);
+                    mDownloadId = Utils.getColumnLong(cur, Strings.DOWNLOAD_ID);
+                }
 
-        Cursor cur = null;
-        try {
-            cur = db.rawQuery(query, null);
-            if (cur != null && cur.getCount() > 0) {
-                cur.moveToFirst();
-                existed = true;
-                mId = Utils.getColumnString(cur, Strings.DOWNLOAD_PLUS_ID);
-                mUrl = Utils.getColumnString(cur, Strings.URL);
-                mDownloadId = Utils.getColumnLong(cur, Strings.DOWNLOAD_ID);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cur != null)
+                    cur.close();
+                if (db != null)
+                    db.close();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cur != null)
-                cur.close();
-            if (db != null)
-                db.close();
         }
         return existed;
     }
@@ -484,8 +488,6 @@ public class Downloader {
                 else
                     downloadList.add(downloadItem);
             } while (cursor.moveToNext());
-        } else {
-            //List is Empty
         }
         if (cursor != null) {
             cursor.close();
@@ -511,7 +513,6 @@ public class Downloader {
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             downloadItem = fetchDownloadItem(context, cursor);
-        } else {
         }
         if (cursor != null) {
             cursor.close();

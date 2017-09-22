@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOLS_VERSION as String
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 22
-        versionCode 8
-        versionName "1.1.1"
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME as String
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -34,12 +34,12 @@ dependencies {
 }
 
 publish {
-    userOrg = 'siaray'
-    groupId = 'com.siaray'
-    artifactId = 'downloadmanagerplus'
-    uploadName = 'DownloadManagerPlus'
-    publishVersion = '1.1.1'
-    desc = 'Using faster and easier than Android Download Manager.'
-    website = 'https://github.com/SIARAY/DownloadManagerPlus'
+    userOrg = USER_NAME as String
+    groupId = GROUP as String
+    artifactId = ARTIFACT_ID as String
+    uploadName = UPLOAD_NAME as String
+    publishVersion = VERSION_NAME as String
+    desc = DESCRIPTION as String
+    website = GITHUB_LINK as String
 }
 

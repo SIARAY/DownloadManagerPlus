@@ -1,6 +1,6 @@
 package com.siaray.downloadmanagerplussample;
 
-import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -30,25 +30,6 @@ public class NormalActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
         inflateUi();
-    }
-
-    private Downloader getDownloader(FileItem item, DownloadListener listener) {
-        return new Downloader(NormalActivity.this, AppController.downloadManager)
-                .setListener(listener)
-                .setUrl(item.getUri())
-                .setId(item.getId())
-                .setAllowedOverRoaming(false)
-                //.setAllowedOverMetered(false) Api 16 and higher
-                .setVisibleInDownloadsUi(true)
-                .setDescription(Utils.readableFileSize(item.getFileSize()))
-                .setScanningByMediaScanner(true)
-                .setNotificationVisibility(DownloadManager
-                        .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
-                        | DownloadManager.Request.NETWORK_MOBILE)
-                .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
-                        , Utils.getFileName(item.getUri()))
-                .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
     }
 
     private void inflateUi() {
@@ -93,31 +74,50 @@ public class NormalActivity extends AppCompatActivity {
         btnAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
-                if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING
-                        || downloader.getStatus(item.getId()) == DownloadStatus.PAUSED
-                        || downloader.getStatus(item.getId()) == DownloadStatus.PENDING)
-                    downloader.cancel(item.getId());
-                else if (downloader.getStatus(item.getId()) == DownloadStatus.SUCCESSFUL) {
-                    Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getId()));
-                } else
-                    downloader.start();
+                clickOnActionButton(item);
             }
         });
-        showPercent(item, item.getListener());
+        showProgress(item, item.getListener());
 
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Downloader downloader = new Downloader(NormalActivity.this, AppController.downloadManager, item.getUri())
+                Downloader downloader = Downloader.getInstance(NormalActivity.this, AppController.downloadManager)
+                        .setUrl(item.getUri())
                         .setListener(item.getListener());
 
                 downloader.deleteFile(item.getId(), deleteListener);
             }
         });
+    }
 
+    private void clickOnActionButton(FileItem item) {
+        final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
+        if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING
+                || downloader.getStatus(item.getId()) == DownloadStatus.PAUSED
+                || downloader.getStatus(item.getId()) == DownloadStatus.PENDING)
+            downloader.cancel(item.getId());
+        else if (downloader.getStatus(item.getId()) == DownloadStatus.SUCCESSFUL) {
+            Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getId()));
+        } else
+            downloader.start();
+    }
 
+    private Downloader getDownloader(FileItem item, DownloadListener listener) {
+        return Downloader.getInstance(NormalActivity.this, AppController.downloadManager)
+                .setListener(listener)
+                .setUrl(item.getUri())
+                .setId(item.getId())
+                .setAllowedOverRoaming(false)
+                //.setAllowedOverMetered(false) Api 16 and higher
+                .setVisibleInDownloadsUi(true)
+                .setDescription(Utils.readableFileSize(item.getFileSize()))
+                .setScanningByMediaScanner(true)
+                .setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
+                .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
+                        , Utils.getFileName(item.getUri()))
+                .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
     }
 
     private ActionListener getDeleteListener(final ImageView ivAction
@@ -219,14 +219,17 @@ public class NormalActivity extends AppCompatActivity {
                 numberProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;
                 progressWheel.setVisibility(View.GONE);
-                tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                        + "/" + Utils.readableFileSize(mTotalBytes));
+                if (mTotalBytes < 0 || mDownloadedBytes < 0)
+                    tvSize.setText("loading...");
+                else
+                    tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
+                            + "/" + Utils.readableFileSize(mTotalBytes));
             }
 
         };
     }
 
-    private void showPercent(FileItem item, DownloadListener listener) {
+    private void showProgress(FileItem item, DownloadListener listener) {
         getDownloader(item, listener).showProgress();
     }
 

@@ -11,43 +11,43 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.1.1'
+        compile 'com.siaray:downloadmanagerplus:1.1.2'
     }
 
 ## Usage
 
 ##### To start the download.
 
-    Downloader downloader = new Downloader(context, downloadManager)
+    Downloader downloader = Downloader.getInstance(context, downloadManager)
      .setUrl(url)
      .setListener(listener)
      .setId(id)
-     .setAllowedOverRoaming(false)
-     .setAllowedOverMetered(false) //Api 16 and higher
-     .setVisibleInDownloadsUi(true)
+     .setAllowedOverRoaming(roamingAllowed)
+     .setAllowedOverMetered(meteredAllowed) //Api 16 and higher
+     .setVisibleInDownloadsUi(isVisible)
      .setDestinationDir(path, fileName)
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
      .setNotificationVisibility(visibility)
-     .setAllowedNetworkTypes(networkTypes);
-     
-    downloader.start();
+     .setAllowedNetworkTypes(networkTypes)
+     .start();
 
 ##### To view download status and progress that has already started.
 
     downloader.showProgress();
 
 ##### To cancel a download.
+> `id parameter is download plus id)`
 
-    downloader.cancel(downloadId);
+    downloader.cancel(id);
 
 ##### Detect download status.
 
-    downloader.getStatus(downloadId);
+    downloader.getStatus(id);
 
 ##### Delete the downloaded file.
 
-    downloader.deleteFile(downloadId, deleteListener);
+    downloader.deleteFile(id, deleteListener);
 
 ##### Get download id.
 
