@@ -37,7 +37,7 @@ Using faster and easier than Android Download Manager
     downloader.showProgress();
 
 ##### To cancel a download.
-> `id parameter is download plus id)`
+> `id parameter is download plus id`
 
     downloader.cancel(id);
 
