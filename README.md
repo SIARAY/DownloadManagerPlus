@@ -65,7 +65,7 @@ Using faster and easier than Android Download Manager
 
     Downloader.getDownloadsList(context, downloadManager);
 
-## Licence
+## license
 
     Copyright 2017 Siamak Rayeji
 
