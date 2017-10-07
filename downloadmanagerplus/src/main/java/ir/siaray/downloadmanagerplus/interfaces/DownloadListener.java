@@ -1,6 +1,6 @@
-package com.siaray.downloadmanagerplus.interfaces;
+package ir.siaray.downloadmanagerplus.interfaces;
 
-import com.siaray.downloadmanagerplus.enums.DownloadReason;
+import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 
 /**
  * Created by Siamak on 16/01/2017.

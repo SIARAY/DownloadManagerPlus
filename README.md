@@ -11,14 +11,14 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.1.2'
+        compile 'com.siaray:downloadmanagerplus:1.2.0'
     }
 
 ## Usage
 
 ##### To start the download.
 
-    Downloader downloader = Downloader.getInstance(context, downloadManager)
+    Downloader downloader = Downloader.getInstance(context)
      .setUrl(url)
      .setListener(listener)
      .setId(id)
@@ -65,7 +65,34 @@ Using faster and easier than Android Download Manager
 
     Downloader.getDownloadsList(context, downloadManager);
 
-## license
+##### Download Notification BroadcastReceiver.
+    class YourNotificationBroadcastReceiver extends NotificationBroadcastReceiver{
+        @Override
+        public void onCompleted(Context context, Intent intent, long downloadId) {
+            super.onCompleted(context, intent, downloadId);
+        }
+
+        @Override
+        public void onClicked(Context context, Intent intent, long[] downloadIdList) {
+            super.onClicked(context, intent, downloadIdList);
+        }
+
+        @Override
+        public void onFailed(Context context, Intent intent, long downloadId) {
+            super.onFailed(context, intent, downloadId);
+        }
+    }    
+    
+> `To register YourBroadcastReceiver Add to your app Manifest`
+
+            <receiver android:name=".YourNotificationBroadcastReceiver">
+                <intent-filter>
+                    <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                    <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+                </intent-filter>
+            </receiver>
+
+## License
 
     Copyright 2017 Siamak Rayeji
 

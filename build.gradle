@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.novoda:bintray-release:0.4.0'
+        classpath 'com.novoda:bintray-release:0.5.0'
     }
 }
 
@@ -14,4 +14,76 @@ allprojects {
     }
 }
 
+ext {
+    ARTIFACT_ID = LIBRARY_ARTIFACT_ID as String
+    VERSION_NAME = LIBRARY_VERSION_NAME as String
+    VERSION_CODE = LIBRARY_VERSION_CODE as int
 
+    DESCRIPTION = LIBRARY_DESCRIPTION as String
+
+    SITE_URL = GITHUB_URL as String
+    GIT_URL = LIBRARY_GIT_URL as String
+    GROUP_NAME = GROUP as String
+    COMPILE_SDK = COMPILE_SDK_VERSION as int
+    BUILD_TOOLS = BUILD_TOOLS_VERSION as String
+
+    MODULE_NAME = LIBRARY_ARTIFACT_ID as String
+
+    LICENSE = LIBRARY_LICENSE as String
+
+    DEVELOPER_ID = USER_NAME as String
+    DEVELOPER_NAME = NAME as String
+    DEVELOPER_EMAIL = EMAIL as String
+
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any { it.contains('bintrayUpload') }
+}
+
+subprojects {
+    group = GROUP_NAME
+    version = VERSION_NAME
+
+    if (IS_UPLOADING && project.name in [MODULE_NAME]) {
+        println project.name
+        apply plugin: 'maven'
+
+        gradle.taskGraph.whenReady { taskGraph ->
+            taskGraph.getAllTasks().find {
+                it.path == ":$project.name:generatePomFileForReleasePublication"
+            }.doLast {
+                file("build/publications/release/pom-default.xml").delete()
+                println 'Overriding pom-file to make sure we can sync to maven central!'
+                pom {
+                    //noinspection GroovyAssignabilityCheck
+                    project {
+                        name "$project.name"
+                        artifactId ARTIFACT_ID
+                        packaging project.name == 'compiler' ? 'jar' : 'aar'
+                        description DESCRIPTION
+                        url SITE_URL
+                        version VERSION_NAME
+
+                        scm {
+                            url GIT_URL
+                            connection GIT_URL
+                            developerConnection GIT_URL
+                        }
+
+                        licenses {
+                            license {
+                                name LICENSE
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id DEVELOPER_ID
+                                name DEVELOPER_NAME
+                                email DEVELOPER_EMAIL
+                            }
+                        }
+                    }
+                }.writeTo("build/publications/release/pom-default.xml")
+            }
+        }
+    }
+}

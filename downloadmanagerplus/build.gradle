@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion MIN_SDK_VERSION as int
         targetSdkVersion TARGET_SDK_VERSION as int
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME as String
+        versionCode LIBRARY_VERSION_CODE as int
+        versionName LIBRARY_VERSION_NAME as String
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -36,10 +36,10 @@ dependencies {
 publish {
     userOrg = USER_NAME as String
     groupId = GROUP as String
-    artifactId = ARTIFACT_ID as String
+    artifactId = LIBRARY_ARTIFACT_ID as String
     uploadName = UPLOAD_NAME as String
-    publishVersion = VERSION_NAME as String
-    desc = DESCRIPTION as String
-    website = GITHUB_LINK as String
+    publishVersion = LIBRARY_VERSION_NAME as String
+    desc = LIBRARY_DESCRIPTION as String
+    website = GITHUB_URL as String
+    issueTracker = ISSUE_TRACKER as String
 }
-

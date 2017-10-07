@@ -1,16 +1,19 @@
-package com.siaray.downloadmanagerplus.utils;
+package ir.siaray.downloadmanagerplus.utils;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.text.DecimalFormat;
 
 /**
- * Created by Siamak on 08/01/2017.
+ * Created by SIARAY on 08/01/2017.
  */
 
 public class Utils {
@@ -79,7 +82,10 @@ public class Utils {
     }
 
     public static boolean deleteDownload(Context context, String id) {
-
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
+            return false;
+        }
         SQLiteDatabase db = openDatabase(context);
         try {
             db.execSQL("delete from " + Constants.DOWNLOAD_DB_TABLE + " WHERE " + Strings.DOWNLOAD_PLUS_ID + "='" + id + "'");
@@ -120,7 +126,7 @@ public class Utils {
             , String id
             , String url
             , long downloadId) {
-        if (id != null) {
+        if (!isIdEmpty(id)) {
             SQLiteDatabase db = openDatabase(context);
             try {
                 db.execSQL("INSERT OR REPLACE INTO "
@@ -148,19 +154,25 @@ public class Utils {
                 if (db != null)
                     db.close();
             }
+        } else {
+            Log.print("id can not be null");
         }
     }
 
     public static void addToThreadList(String id, Thread thread) {
-        if (id == null)
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
             return;
+        }
         Constants.fieldList.add(id);
         Constants.threadList.add(thread);
     }
 
     public static void removeFromThreadList(String id) {
-        if (id == null)
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
             return;
+        }
         int index = getIdListIndex(id);
         if (index >= 0) {
 
@@ -216,35 +228,42 @@ public class Utils {
         return (new File(url).exists());
     }
 
-    /*public static long getDownloadFileSize(final String downloadLink) {
-        new AsyncTask<Void,Integer,Void>() {
-
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                long fileSize = -1;
-                try {
-                    URL url = new URL(downloadLink);
-                    URLConnection urlConnection = url.openConnection();
-                    urlConnection.connect();
-                    fileSize = urlConnection.getContentLength();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }.execute();
-
-    }*/
-
     public static String readableFileSize(long size) {
-        if(size < 0) return "";
-        if(size == 0) return "0";
-        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
-        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+        if (size < 0) return "";
+        if (size == 0) return "0";
+        final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+
+    public static boolean isIdEmpty(String id) {
+        if (id == null || id.length() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isValidDirectory(String dir) {
+        if (!TextUtils.isEmpty(dir)) {
+            File d = new File(dir);
+            if (d.isDirectory())
+                return true;
+        }
+        return false;
+    }
+
+    public static boolean isNecessaryPermissionsGiven(Context context) {
+        int writeExternalPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
+        boolean permissionIsOk = true;
+        if (writeExternalPermission < 0) {
+            permissionIsOk = false;
+            Log.print("Permission required: "+Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (internetPermission < 0) {
+            permissionIsOk = false;
+            Log.print("Permission required: "+Manifest.permission.INTERNET);
+        }
+        return permissionIsOk;
     }
 }

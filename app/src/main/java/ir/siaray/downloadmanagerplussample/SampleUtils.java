@@ -1,4 +1,4 @@
-package com.siaray.downloadmanagerplussample;
+package ir.siaray.downloadmanagerplussample;
 
 import android.content.Context;
 import android.os.AsyncTask;

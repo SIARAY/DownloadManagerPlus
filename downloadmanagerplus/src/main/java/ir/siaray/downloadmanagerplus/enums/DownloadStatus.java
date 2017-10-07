@@ -1,7 +1,7 @@
-package com.siaray.downloadmanagerplus.enums;
+package ir.siaray.downloadmanagerplus.enums;
 
 /**
- * Created by Siamak on 15/01/2017.
+ * Created by SIARAY on 15/01/2017.
  */
 
 public enum DownloadStatus {

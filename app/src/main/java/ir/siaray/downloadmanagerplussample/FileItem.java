@@ -1,8 +1,8 @@
-package com.siaray.downloadmanagerplussample;
+package ir.siaray.downloadmanagerplussample;
 
 
-import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
-import com.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
 
 /**
  * Created by Siamak on 07/01/2017.

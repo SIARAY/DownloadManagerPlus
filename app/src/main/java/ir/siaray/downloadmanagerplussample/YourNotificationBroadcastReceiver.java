@@ -1,42 +1,40 @@
-package com.siaray.downloadmanagerplussample;
+package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.siaray.downloadmanagerplus.classes.Downloader;
-import com.siaray.downloadmanagerplus.model.DownloadItem;
-import com.siaray.downloadmanagerplus.utils.Log;
+import ir.siaray.downloadmanagerplus.classes.Downloader;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.receivers.NotificationBroadcastReceiver;
+import ir.siaray.downloadmanagerplus.utils.Log;
 
 /**
  * Created by Siamak on 12/05/2017.
  */
 
-public class DownloadBroadcastReceiver extends BroadcastReceiver {
+public class YourNotificationBroadcastReceiver extends NotificationBroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        Log.i("Download : " + action);
+    public void onCompleted(Context context, Intent intent, long downloadId) {
+        super.onCompleted(context, intent, downloadId);
+        printDownloadedFileId(context, intent);
+    }
 
-        if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
-            printDownloadedFileId(context, intent);
-        } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(action)) {
-            //openDownloadedFilesActivity(context);
-            Toast.makeText(context, "Download Notification Clicked.", Toast.LENGTH_SHORT).show();
-            printDownloadingFilesId(context, intent);
-            openCustomActivity(context);
-        }
-
+    @Override
+    public void onClicked(Context context, Intent intent, long[] downloadIdList) {
+        super.onClicked(context, intent, downloadIdList);
+        Toast.makeText(context, "Download Notification Clicked.", Toast.LENGTH_SHORT).show();
+        printDownloadingFilesId(context, intent);
+        openCustomActivity(context);
     }
 
     private void printDownloadedFileId(Context context, Intent intent) {
         long downloadId = intent.getLongExtra(
                 DownloadManager.EXTRA_DOWNLOAD_ID, 0);
         String id = Downloader.getId(context, downloadId);
-        DownloadItem downloadItem = Downloader.getDownloadItem(context, AppController.downloadManager, id);
+        DownloadItem downloadItem = Downloader.getDownloadItem(context, id);
         if (downloadItem != null && downloadItem.getPercent() == 100) {
             Log.i("Download Completed. Download id: " + downloadId);
             Log.i("Download plus id: " + id);

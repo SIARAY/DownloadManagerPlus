@@ -1,9 +1,9 @@
-package com.siaray.downloadmanagerplus.model;
+package ir.siaray.downloadmanagerplus.model;
 
 import android.app.DownloadManager;
 
-import com.siaray.downloadmanagerplus.enums.DownloadStatus;
-import com.siaray.downloadmanagerplus.utils.Utils;
+import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.utils.Utils;
 
 /**
  * Created by Siamak on 01/06/2017.
@@ -129,6 +129,11 @@ public class DownloadItem {
         this.localUri = localUri;
     }
 
+    @Deprecated
+    /**
+     * This method is Deprecated
+     * Instead, use the getLocalUri() method
+     */
     public String getLocalFileName() {
         return localFileName;
     }

@@ -1,9 +1,9 @@
-package com.siaray.downloadmanagerplus.enums;
+package ir.siaray.downloadmanagerplus.enums;
 
 import android.app.DownloadManager;
 
 /**
- * Created by Siamak on 09/06/2017.
+ * Created by SIARAY on 09/06/2017.
  */
 
 public enum DownloadReason {

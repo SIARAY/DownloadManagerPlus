@@ -1,4 +1,4 @@
-package com.siaray.downloadmanagerplussample;
+package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager;
 import android.content.Intent;
@@ -8,16 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.siaray.downloadmanagerplus.classes.Downloader;
-import com.siaray.downloadmanagerplus.model.DownloadItem;
-import com.siaray.downloadmanagerplus.utils.Log;
-import com.siaray.downloadmanagerplus.utils.Utils;
-
 import java.util.List;
+
+import ir.siaray.downloadmanagerplus.classes.Downloader;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.utils.Log;
+import ir.siaray.downloadmanagerplus.utils.Utils;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    private Downloader testDownload;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
-                List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext()
-                        ,AppController.downloadManager);
+                List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext());
                 if(list.size()>0) {
                     Utils.openFile(MainActivity.this, list.get(0).getLocalUri());
                     Toast.makeText(this, Log.printItems(list.get(0)), Toast.LENGTH_LONG).show();
@@ -83,5 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(1, b.build());
     }*/
+    private void showStatus(){
+        Log.i("statusssss: "+testDownload.getStatus("https://wallpaperbrowse.com/media/images/best-hd-wallpaper-download-12.jpg"));
+    }
 
 }

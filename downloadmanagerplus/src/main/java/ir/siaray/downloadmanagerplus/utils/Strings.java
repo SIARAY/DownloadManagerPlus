@@ -1,7 +1,7 @@
-package com.siaray.downloadmanagerplus.utils;
+package ir.siaray.downloadmanagerplus.utils;
 
 /**
- * Created by Siamak on 22/04/2017.
+ * Created by SIARAY on 22/04/2017.
  */
 
 public class Strings {

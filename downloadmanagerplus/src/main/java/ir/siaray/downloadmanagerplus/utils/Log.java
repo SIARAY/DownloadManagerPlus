@@ -1,15 +1,19 @@
-package com.siaray.downloadmanagerplus.utils;
+package ir.siaray.downloadmanagerplus.utils;
 
 import java.lang.reflect.Field;
 
 /**
- * Created by Siamak on 15/12/2016.
+ * Created by SIARAY on 15/12/2016.
  */
 
 public class Log {
-
+private static String TAG="DownloadManagerPlus";
     public static <T> void i(T msg) {
-        //android.util.Log.i("DownloadManagerPlus", "" + msg);
+        android.util.Log.i(TAG, "" + msg);
+    }
+
+    public static <T> void print(T msg) {
+        android.util.Log.i(TAG, "" + msg);
     }
 
     public static String printItems(Object obj) {

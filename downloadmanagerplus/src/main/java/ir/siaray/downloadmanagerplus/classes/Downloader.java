@@ -1,4 +1,4 @@
-package com.siaray.downloadmanagerplus.classes;
+package ir.siaray.downloadmanagerplus.classes;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -13,24 +13,27 @@ import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 
-import com.siaray.downloadmanagerplus.enums.DownloadReason;
-import com.siaray.downloadmanagerplus.enums.DownloadStatus;
-import com.siaray.downloadmanagerplus.enums.Errors;
-import com.siaray.downloadmanagerplus.interfaces.ActionListener;
-import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
-import com.siaray.downloadmanagerplus.model.DownloadItem;
-import com.siaray.downloadmanagerplus.utils.Constants;
-import com.siaray.downloadmanagerplus.utils.Log;
-import com.siaray.downloadmanagerplus.utils.Strings;
-import com.siaray.downloadmanagerplus.utils.Utils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import ir.siaray.downloadmanagerplus.enums.DownloadReason;
+import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.enums.Errors;
+import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
+import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.utils.Constants;
+import ir.siaray.downloadmanagerplus.utils.Log;
+import ir.siaray.downloadmanagerplus.utils.Strings;
+import ir.siaray.downloadmanagerplus.utils.Utils;
+
+import static ir.siaray.downloadmanagerplus.utils.Utils.isIdEmpty;
+import static ir.siaray.downloadmanagerplus.utils.Utils.isValidDirectory;
+
 
 /**
- * Created by Siamak on 19/01/2017.
+ * Created by SIARAY on 19/01/2017.
  * https://github.com/SIARAY/DownloadManagerPlus
  */
 
@@ -45,7 +48,6 @@ public class Downloader {
     private String mId = null;
     private String mLocalUri;
     private DownloadListener mListener;
-    private DownloadManager mDownloadManager;
     private DownloadStatus mDownloadStatus = DownloadStatus.CANCELED;
     private long mDownloadId;
     private int mPercent;
@@ -59,25 +61,30 @@ public class Downloader {
     private boolean mRoamingAllowed = false;
     private boolean mVisibleInDownloadsUi = true;
     private boolean mMeteredAllowed = false;
+    private static DownloadManager downloadManager;
 
-    /*private Downloader(Context mContext, DownloadManager downloadManager, String url) {
-        this.mContext = mContext;
-        mDownloadManager = downloadManager;
-        mUrl = url;
-    }*/
-
-    public static Downloader getInstance(Context mContext, DownloadManager downloadManager){
-        return (new Downloader(mContext,downloadManager));
+    public static Downloader getInstance(Context mContext) {
+        return (new Downloader(mContext));
     }
 
-    private Downloader(Context mContext, DownloadManager downloadManager) {
-        this.mContext = mContext;
-        mDownloadManager = downloadManager;
+    public static DownloadManager getDownloadManager() {
+        return downloadManager;
+    }
+
+    private Downloader(Context context) {
+        setDownloadManager(context);
+        Utils.createDBTables(context);
+        this.mContext = context;
+    }
+
+    private static void setDownloadManager(Context context) {
+        if (downloadManager == null) {
+            downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        }
     }
 
     public Downloader setId(String id) {
         mId = id;
-        Utils.createDBTables(mContext);
         return this;
     }
 
@@ -151,14 +158,30 @@ public class Downloader {
     }
 
     private boolean isThereAnError() {
+        if (!Utils.isNecessaryPermissionsGiven(mContext)) {
+            return true;
+        }
+
         if (TextUtils.isEmpty(mUrl) || !URLUtil.isValidUrl(mUrl)) {
-            mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID, mTotalBytes, mDownloadedBytes);
+            Log.print("url can not be empty");
+            if (mListener != null)
+                mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID, mTotalBytes, mDownloadedBytes);
             return true;
         }
-        if (TextUtils.isEmpty(mId)) {
-            mListener.onFail(mPercent, DownloadReason.ID_NOT_FOUND, mTotalBytes, mDownloadedBytes);
-            return true;
+
+        if (isIdEmpty(mId)) {
+            Log.print("id can not be null");
+            mId = mUrl;
         }
+
+        if (!isValidDirectory(mDestinationDir)) {
+            mDestinationDir = Environment.DIRECTORY_DOWNLOADS;
+        }
+
+        if (TextUtils.isEmpty(mFileName)) {
+            mFileName = Utils.getFileName(mUrl);
+        }
+
         if (isDownloadRunning()) {
             if (mListener != null) {
                 if (mDownloadStatus == DownloadStatus.SUCCESSFUL)
@@ -183,18 +206,19 @@ public class Downloader {
 
         if (mScanningByMediaAllowed)
             request.allowScanningByMediaScanner();
-        if (mDestinationDir != null && mFileName != null)
+        if (!TextUtils.isEmpty(mDestinationDir) && !TextUtils.isEmpty(mFileName))
             request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
 
-        if (mDescription != null && !mDescription.isEmpty())
+        if (!TextUtils.isEmpty(mDescription)) {
             request.setDescription(mDescription);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             request.setAllowedOverMetered(mMeteredAllowed);
         }
 
         cancel(mId);
-        mDownloadId = mDownloadManager.enqueue(request);
+        mDownloadId = downloadManager.enqueue(request);
 
         Utils.updateDB(mContext, mId, mUrl, mDownloadId);
         showProgress();
@@ -209,10 +233,14 @@ public class Downloader {
     }
 
     public void cancel(String id) {
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
+            return;
+        }
         mId = id;
         findDownloadHistory();
         if (mDownloadId > 0) {
-            mDownloadManager.remove(mDownloadId);
+            downloadManager.remove(mDownloadId);
             Utils.deleteDownload(mContext, id);
         }
     }
@@ -227,24 +255,29 @@ public class Downloader {
                     boolean deleted = downloadedFile.delete();
                     if (deleted) {
                         cancel(id);
-                        listener.onSuccess();
+                        if (listener != null)
+                            listener.onSuccess();
                         return true;
                     } else {
-                        listener.onFailure(Errors.CAN_NOT_DELETE_FILE);
+                        if (listener != null)
+                            listener.onFailure(Errors.CAN_NOT_DELETE_FILE);
                         return false;
                     }
                 } else {
-                    listener.onFailure(Errors.FILE_NOT_FOUND);
+                    if (listener != null)
+                        listener.onFailure(Errors.FILE_NOT_FOUND);
                     return false;
                 }
             }
         }
-        listener.onFailure(Errors.FILE_PATH_NOT_FOUND);
+        if (listener != null)
+            listener.onFailure(Errors.FILE_PATH_NOT_FOUND);
         return false;
     }
 
     public DownloadStatus getStatus(String id) {
-        if (id == null) {
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
             return DownloadStatus.NONE;
         }
         mId = id;
@@ -254,6 +287,10 @@ public class Downloader {
     }
 
     public String getDownloadedFilePath(String id) {
+        if (isIdEmpty(id)) {
+            Log.print("id can not be null");
+            return null;
+        }
         mId = id;
         findDownloadHistory();
         getDownloadStatusWithReason();
@@ -261,6 +298,8 @@ public class Downloader {
     }
 
     public void showProgress() {
+        if (mListener == null)
+            return;
         if (findDownloadHistory()) {
             final Thread thread = new Thread(new Runnable() {
 
@@ -268,10 +307,8 @@ public class Downloader {
                 public void run() {
                     final boolean[] continuous = {true};
                     do {
-
                         if (mContext != null) {
                             getDownloadStatusWithReason();
-
                             ((Activity) mContext).runOnUiThread(new Runnable() {
 
                                 @Override
@@ -313,7 +350,7 @@ public class Downloader {
                             && !Thread.interrupted()
                             && continuous[0]);
 
-                    int index = com.siaray.downloadmanagerplus.utils.Utils.getThreadListIndex(Thread.currentThread());
+                    int index = Utils.getThreadListIndex(Thread.currentThread());
                     if (index >= 0) {
                         Utils.removeFromThreadList(mId);
                     }
@@ -322,17 +359,18 @@ public class Downloader {
             });
             Utils.removeFromThreadList(mId);
             Utils.addToThreadList(mId, thread);
-
             thread.start();
         }
     }
 
     private void getDownloadStatusWithReason() {
-
+        if (!Utils.isNecessaryPermissionsGiven(mContext)) {
+            return;
+        }
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(mDownloadId);
 
-        final Cursor cursor = mDownloadManager.query(q);
+        final Cursor cursor = downloadManager.query(q);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             mDownloadedBytes = Utils.getColumnInt(cursor
@@ -366,6 +404,7 @@ public class Downloader {
                     if (!Utils.isFileExist(mLocalUri)) {
                         mDownloadStatus = DownloadStatus.CANCELED;
                         cancel(mId);
+
                     }
                     break;
                 default:
@@ -380,12 +419,11 @@ public class Downloader {
         if (cursor != null) {
             cursor.close();
         }
-
     }
 
     private boolean findDownloadHistory() {
         boolean existed = false;
-        if (mId != null) {
+        if (!isIdEmpty(mId)) {
             String query;
             SQLiteDatabase db = Utils.openDatabase(mContext);
             query = "SELECT * FROM "
@@ -472,7 +510,7 @@ public class Downloader {
     }
 
 
-    public static List<DownloadItem> getDownloadsList(Context context, DownloadManager downloadManager) {
+    public static List<DownloadItem> getDownloadsList(Context context) {
         List<DownloadItem> downloadList = new ArrayList<>();
         DownloadManager.Query q = new DownloadManager.Query();
         //q.setFilterById(downloadId);
@@ -495,11 +533,8 @@ public class Downloader {
         return downloadList;
     }
 
-    public static DownloadItem getDownloadItem(Context context, DownloadManager downloadManager, String id) {
-        if (context == null
-                || downloadManager == null
-                || id == null
-                || id.isEmpty()) {
+    public static DownloadItem getDownloadItem(Context context, String id) {
+        if (context == null || Utils.isIdEmpty(id)) {
             return null;
         }
         DownloadItem downloadItem = null;

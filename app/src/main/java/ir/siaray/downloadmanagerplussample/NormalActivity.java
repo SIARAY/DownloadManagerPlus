@@ -1,4 +1,4 @@
-package com.siaray.downloadmanagerplussample;
+package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager.Request;
 import android.os.Bundle;
@@ -13,14 +13,15 @@ import android.widget.Toast;
 
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.pnikosis.materialishprogress.ProgressWheel;
-import com.siaray.downloadmanagerplus.classes.Downloader;
-import com.siaray.downloadmanagerplus.enums.DownloadReason;
-import com.siaray.downloadmanagerplus.enums.DownloadStatus;
-import com.siaray.downloadmanagerplus.enums.Errors;
-import com.siaray.downloadmanagerplus.interfaces.ActionListener;
-import com.siaray.downloadmanagerplus.interfaces.DownloadListener;
-import com.siaray.downloadmanagerplus.utils.Log;
-import com.siaray.downloadmanagerplus.utils.Utils;
+
+import ir.siaray.downloadmanagerplus.classes.Downloader;
+import ir.siaray.downloadmanagerplus.enums.DownloadReason;
+import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.enums.Errors;
+import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
+import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import ir.siaray.downloadmanagerplus.utils.Log;
+import ir.siaray.downloadmanagerplus.utils.Utils;
 
 public class NormalActivity extends AppCompatActivity {
 
@@ -69,20 +70,24 @@ public class NormalActivity extends AppCompatActivity {
                 , numberProgressBar
                 , progressWheel
                 , tvSize);
-        //final DownloadListener listener = getDownloadListener(ivAction, numberProgressBar);
         item.setListener(getDownloadListener(ivAction, numberProgressBar, progressWheel, tvSize));
+
+        //Download Button
         btnAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 clickOnActionButton(item);
             }
         });
+
+        //Showing progress for running downloads.
         showProgress(item, item.getListener());
 
+        //Delete Button
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Downloader downloader = Downloader.getInstance(NormalActivity.this, AppController.downloadManager)
+                Downloader downloader = Downloader.getInstance(NormalActivity.this)
                         .setUrl(item.getUri())
                         .setListener(item.getListener());
 
@@ -104,7 +109,7 @@ public class NormalActivity extends AppCompatActivity {
     }
 
     private Downloader getDownloader(FileItem item, DownloadListener listener) {
-        return Downloader.getInstance(NormalActivity.this, AppController.downloadManager)
+        return Downloader.getInstance(NormalActivity.this)
                 .setListener(listener)
                 .setUrl(item.getUri())
                 .setId(item.getId())
@@ -232,6 +237,4 @@ public class NormalActivity extends AppCompatActivity {
     private void showProgress(FileItem item, DownloadListener listener) {
         getDownloader(item, listener).showProgress();
     }
-
-
 }

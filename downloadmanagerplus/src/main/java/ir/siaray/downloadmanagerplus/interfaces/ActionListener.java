@@ -1,6 +1,6 @@
-package com.siaray.downloadmanagerplus.interfaces;
+package ir.siaray.downloadmanagerplus.interfaces;
 
-import com.siaray.downloadmanagerplus.enums.Errors;
+import ir.siaray.downloadmanagerplus.enums.Errors;
 
 /**
  * Created by Siamak on 17/02/2017.
