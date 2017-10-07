@@ -83,14 +83,14 @@ Using faster and easier than Android Download Manager
         }
     }    
     
-> `To register YourBroadcastReceiver Add to your app Manifest`
+> `To register YourBroadcastReceiver to your app Manifest`
 
-            <receiver android:name=".YourNotificationBroadcastReceiver">
-                <intent-filter>
-                    <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
-                    <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
-                </intent-filter>
-            </receiver>
+    <receiver android:name=".YourNotificationBroadcastReceiver">
+        <intent-filter>
+            <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+        </intent-filter>
+    </receiver>
 
 ## License
 
