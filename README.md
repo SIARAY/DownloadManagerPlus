@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'com.siaray:downloadmanagerplus:1.2.0'
+        compile 'ir.siaray:downloadmanagerplus:1.2.0'
     }
 
 ## Usage
@@ -59,11 +59,11 @@ Using faster and easier than Android Download Manager
 
 ##### Get download item.
 
-    Downloader.getDownloadItem(context, downloadManager, id);
+    Downloader.getDownloadItem(context, id);
 
 ##### Get downloads list.
 
-    Downloader.getDownloadsList(context, downloadManager);
+    Downloader.getDownloadsList(context);
 
 ##### Download Notification BroadcastReceiver.
     class YourNotificationBroadcastReceiver extends NotificationBroadcastReceiver{
@@ -83,7 +83,7 @@ Using faster and easier than Android Download Manager
         }
     }    
     
-> `To register YourBroadcastReceiver to your app Manifest`
+> `To register YourBroadcastReceiver add to your app Manifest`
 
     <receiver android:name=".YourNotificationBroadcastReceiver">
         <intent-filter>
