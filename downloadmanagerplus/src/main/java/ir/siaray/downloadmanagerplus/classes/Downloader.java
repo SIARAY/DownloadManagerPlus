@@ -151,6 +151,7 @@ public class Downloader {
     }
 
     public void start() {
+        Log.i("start.........");
         if (isThereAnError()) {
             return;
         }
@@ -158,7 +159,17 @@ public class Downloader {
     }
 
     private boolean isThereAnError() {
-        if (!Utils.isNecessaryPermissionsGiven(mContext)) {
+        int permissionError = Utils.getPermissionsError(mContext);
+        if (permissionError != 0) {
+            if (mListener != null) {
+                if (permissionError == DownloadReason.INTERNET_PERMISSION_REQUIRED.getValue()) {
+                    mListener.onFail(mPercent, DownloadReason.INTERNET_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes);
+                } else if (permissionError == DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED.getValue()) {
+                    mListener.onFail(mPercent, DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes);
+                } else {
+                    mListener.onFail(mPercent, DownloadReason.UNKNOWN, mTotalBytes, mDownloadedBytes);
+                }
+            }
             return true;
         }
 
@@ -364,7 +375,8 @@ public class Downloader {
     }
 
     private void getDownloadStatusWithReason() {
-        if (!Utils.isNecessaryPermissionsGiven(mContext)) {
+        int permissionError = Utils.getPermissionsError(mContext);
+        if (permissionError != 0) {
             return;
         }
         DownloadManager.Query q = new DownloadManager.Query();

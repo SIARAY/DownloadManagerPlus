@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.text.DecimalFormat;
+
+import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 
 /**
  * Created by SIARAY on 08/01/2017.
@@ -252,18 +254,21 @@ public class Utils {
         return false;
     }
 
-    public static boolean isNecessaryPermissionsGiven(Context context) {
-        int writeExternalPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
-        boolean permissionIsOk = true;
+    public static int getPermissionsError(Context context) {
+        //int writeExternalPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int writeExternalPermission = PermissionChecker.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        //int internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
+        int internetPermission = PermissionChecker.checkSelfPermission(context, Manifest.permission.INTERNET);
+        int permissionError = 0;
         if (writeExternalPermission < 0) {
-            permissionIsOk = false;
-            Log.print("Permission required: "+Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            permissionError = DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED.getValue();
+            Log.print("Permission required: " + Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if (internetPermission < 0) {
-            permissionIsOk = false;
-            Log.print("Permission required: "+Manifest.permission.INTERNET);
+            permissionError = DownloadReason.INTERNET_PERMISSION_REQUIRED.getValue();
+            Log.print("Permission required: " + Manifest.permission.INTERNET);
         }
-        return permissionIsOk;
+        return permissionError;
     }
+
 }

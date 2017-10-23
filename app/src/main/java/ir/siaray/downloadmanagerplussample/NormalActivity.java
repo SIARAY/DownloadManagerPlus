@@ -195,6 +195,7 @@ public class NormalActivity extends AppCompatActivity {
 
             @Override
             public void onFail(int percent, DownloadReason reason, int mTotalBytes, int mDownloadedBytes) {
+                Toast.makeText(NormalActivity.this, "Failed: "+reason, Toast.LENGTH_SHORT).show();
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
                         + " reason:" + reason);

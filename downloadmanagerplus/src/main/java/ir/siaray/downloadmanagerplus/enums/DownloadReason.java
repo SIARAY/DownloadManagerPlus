@@ -27,7 +27,9 @@ public enum DownloadReason {
     UNKNOWN(-1),
     URL_NOT_VALID(-2),
     ID_NOT_FOUND(-3),
-    DOWNLOAD_IN_PROGRESS(-4);
+    DOWNLOAD_IN_PROGRESS(-4),
+    WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED(-5),
+    INTERNET_PERMISSION_REQUIRED(-6);
 
 
     int value;

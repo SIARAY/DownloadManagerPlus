@@ -14,7 +14,7 @@ allprojects {
     }
 }
 
-ext {
+/*ext {
     ARTIFACT_ID = LIBRARY_ARTIFACT_ID as String
     VERSION_NAME = LIBRARY_VERSION_NAME as String
     VERSION_CODE = LIBRARY_VERSION_CODE as int
@@ -50,7 +50,7 @@ subprojects {
             taskGraph.getAllTasks().find {
                 it.path == ":$project.name:generatePomFileForReleasePublication"
             }.doLast {
-                file("build/publications/release/pom-default.xml").delete()
+                file("build/publications/maven/pom-default.xml").delete()
                 println 'Overriding pom-file to make sure we can sync to maven central!'
                 pom {
                     //noinspection GroovyAssignabilityCheck
@@ -82,8 +82,8 @@ subprojects {
                             }
                         }
                     }
-                }.writeTo("build/publications/release/pom-default.xml")
+                }.writeTo("build/publications/maven/pom-default.xml")
             }
         }
     }
-}
+}*/
