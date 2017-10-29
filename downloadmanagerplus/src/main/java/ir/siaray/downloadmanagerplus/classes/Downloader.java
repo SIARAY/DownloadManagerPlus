@@ -151,7 +151,7 @@ public class Downloader {
     }
 
     public void start() {
-        Log.i("start.........");
+        createDownloadDir();
         if (isThereAnError()) {
             return;
         }
@@ -187,6 +187,11 @@ public class Downloader {
 
         if (!isValidDirectory(mDestinationDir)) {
             mDestinationDir = Environment.DIRECTORY_DOWNLOADS;
+            createDownloadDir();
+            if (!isValidDirectory(mDestinationDir)) {
+                mListener.onFail(mPercent, DownloadReason.DESTINATION_DIRECTORY_NOT_FOUND, mTotalBytes, mDownloadedBytes);
+                return true;
+            }
         }
 
         if (TextUtils.isEmpty(mFileName)) {
@@ -206,7 +211,6 @@ public class Downloader {
     }
 
     private void startDownload() {
-        createDownloadDir();
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mUrl));
 
         request.setAllowedNetworkTypes(mNetworkTypes)
@@ -217,8 +221,10 @@ public class Downloader {
 
         if (mScanningByMediaAllowed)
             request.allowScanningByMediaScanner();
-        if (!TextUtils.isEmpty(mDestinationDir) && !TextUtils.isEmpty(mFileName))
+
+        if (!TextUtils.isEmpty(mDestinationDir) && !TextUtils.isEmpty(mFileName)) {
             request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
+        }
 
         if (!TextUtils.isEmpty(mDescription)) {
             request.setDescription(mDescription);

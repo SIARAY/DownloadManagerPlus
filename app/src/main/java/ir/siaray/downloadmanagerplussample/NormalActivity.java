@@ -1,6 +1,7 @@
 package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager.Request;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -109,12 +110,11 @@ public class NormalActivity extends AppCompatActivity {
     }
 
     private Downloader getDownloader(FileItem item, DownloadListener listener) {
-        return Downloader.getInstance(NormalActivity.this)
+        Downloader request = Downloader.getInstance(NormalActivity.this)
                 .setListener(listener)
                 .setUrl(item.getUri())
                 .setId(item.getId())
-                .setAllowedOverRoaming(false)
-                //.setAllowedOverMetered(false) Api 16 and higher
+                .setAllowedOverRoaming(true)
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))
                 .setScanningByMediaScanner(true)
@@ -123,6 +123,10 @@ public class NormalActivity extends AppCompatActivity {
                 .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
                         , Utils.getFileName(item.getUri()))
                 .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            request.setAllowedOverMetered(true); //Api 16 and higher
+        }
+        return request;
     }
 
     private ActionListener getDeleteListener(final ImageView ivAction
@@ -195,7 +199,7 @@ public class NormalActivity extends AppCompatActivity {
 
             @Override
             public void onFail(int percent, DownloadReason reason, int mTotalBytes, int mDownloadedBytes) {
-                Toast.makeText(NormalActivity.this, "Failed: "+reason, Toast.LENGTH_SHORT).show();
+                Toast.makeText(NormalActivity.this, "Failed: " + reason, Toast.LENGTH_SHORT).show();
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
                         + " reason:" + reason);
