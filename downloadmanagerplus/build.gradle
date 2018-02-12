@@ -26,12 +26,11 @@ android {
     lintOptions {
         abortOnError false
     }
-    buildToolsVersion '26.0.2'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.0.0-beta2'
+    compile 'com.android.support:appcompat-v7:27.0.2'
 }
 
 publish {

@@ -72,9 +72,9 @@ public class Downloader {
     }
 
     private Downloader(Context context) {
-        setDownloadManager(context);
-        Utils.createDBTables(context);
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
+        setDownloadManager(mContext);
+        Utils.createDBTables(mContext);
     }
 
     private static void setDownloadManager(Context context) {
