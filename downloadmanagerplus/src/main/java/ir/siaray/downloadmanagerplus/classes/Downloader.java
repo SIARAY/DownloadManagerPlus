@@ -72,7 +72,7 @@ public class Downloader {
     }
 
     private Downloader(Context context) {
-        this.mContext = context.getApplicationContext();
+        this.mContext = context;
         setDownloadManager(mContext);
         Utils.createDBTables(mContext);
     }
@@ -119,6 +119,7 @@ public class Downloader {
         mFileName = fileName;
         return this;
     }
+
 
     public Downloader setNotificationVisibility(int visibility) {
         mNotificationVisibility = visibility;
@@ -325,38 +326,45 @@ public class Downloader {
                     final boolean[] continuous = {true};
                     do {
                         if (mContext != null) {
-                            getDownloadStatusWithReason();
-                            ((Activity) mContext).runOnUiThread(new Runnable() {
+                            if (mContext instanceof Activity) {
+                                getDownloadStatusWithReason();
+                                ((Activity) mContext).runOnUiThread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    if (!continuous[0])
-                                        return;
-                                    //String message = statusMessage();
-                                    switch (mDownloadStatus) {
-                                        case SUCCESSFUL:
-                                            mListener.onComplete(mTotalBytes);
-                                            break;
-                                        case PAUSED:
-                                            mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
-                                            break;
-                                        case PENDING:
-                                            mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
-                                            break;
-                                        case FAILED:
-                                            mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
-                                            break;
-                                        case CANCELED:
-                                            continuous[0] = false;
-                                            mListener.onCancel(mTotalBytes, mDownloadedBytes);
-                                            break;
-                                        default://Running
-                                            mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
-                                            break;
+                                    @Override
+                                    public void run() {
+                                        if (!continuous[0])
+                                            return;
+                                        //String message = statusMessage();
+                                        switch (mDownloadStatus) {
+                                            case SUCCESSFUL:
+                                                mListener.onComplete(mTotalBytes);
+                                                break;
+                                            case PAUSED:
+                                                mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                                                break;
+                                            case PENDING:
+                                                mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
+                                                break;
+                                            case FAILED:
+                                                mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                                                break;
+                                            case CANCELED:
+                                                continuous[0] = false;
+                                                mListener.onCancel(mTotalBytes, mDownloadedBytes);
+                                                break;
+                                            default://Running
+                                                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
+                                                break;
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            } else {
+                                continuous[0] = false;
+                                Log.print("Use activity context for update ui." +
+                                        "Use this in activity or getActivity in fragment");
+                            }
                         } else {
+                            Log.print("Context is null.");
                             break;
                         }
 

@@ -1,14 +1,18 @@
 package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager.Request;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,32 +28,78 @@ import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
-public class NormalActivity extends AppCompatActivity {
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
+public class NormalActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+
+
+    private int notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
+        initSpinner();
         inflateUi();
     }
 
+    private void initSpinner() {
+        Spinner dropdown = findViewById(R.id.sp_notification_type);
+        String[] items = new String[]{
+                "VISIBILITY_VISIBLE_NOTIFY_COMPLETED",
+                "VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION",
+                "VISIBILITY_VISIBLE",
+                "VISIBILITY_HIDDEN"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner, items);
+        dropdown.setAdapter(adapter);
+        dropdown.setOnItemSelectedListener(this);
+        dropdown.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        switch (position) {
+            case 0:
+                notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+
+                break;
+            case 1:
+                notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
+                break;
+
+            case 2:
+                notificationVisibility = Request.VISIBILITY_VISIBLE;
+                break;
+
+            case 3:
+                notificationVisibility = Request.VISIBILITY_HIDDEN;
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+    }
+
     private void inflateUi() {
-        LinearLayout parent = (LinearLayout) findViewById(R.id.main_container);
+        Log.i("drop down:" + notificationVisibility);
+        ViewGroup itemContainer = findViewById(R.id.item_container);
+        //LinearLayout parent = (LinearLayout) findViewById(R.id.main_container);
         View fView = getLayoutInflater().inflate(R.layout.download_list_item, null);
-        parent.addView(fView);
+        itemContainer.addView(fView);
         FileItem fItem = SampleUtils.getDownloadItem(1);
         SampleUtils.setFileSize(getApplicationContext(), fItem);
         initUi(fView, fItem);
 
         View sView = getLayoutInflater().inflate(R.layout.download_list_item, null);
-        parent.addView(sView);
+        itemContainer.addView(sView);
         FileItem sItem = SampleUtils.getDownloadItem(2);
         SampleUtils.setFileSize(getApplicationContext(), sItem);
         initUi(sView, sItem);
 
         View tView = getLayoutInflater().inflate(R.layout.download_list_item, null);
-        parent.addView(tView);
+        itemContainer.addView(tView);
         FileItem tItem = SampleUtils.getDownloadItem(3);
         SampleUtils.setFileSize(getApplicationContext(), tItem);
         initUi(tView, tItem);
@@ -110,7 +160,7 @@ public class NormalActivity extends AppCompatActivity {
     }
 
     private Downloader getDownloader(FileItem item, DownloadListener listener) {
-        Downloader request = Downloader.getInstance(NormalActivity.this)
+        Downloader request = Downloader.getInstance(this)
                 .setListener(listener)
                 .setUrl(item.getUri())
                 .setId(item.getId())
@@ -118,9 +168,9 @@ public class NormalActivity extends AppCompatActivity {
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))
                 .setScanningByMediaScanner(true)
-                .setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setNotificationVisibility(notificationVisibility)
                 .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
-                .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
+                .setDestinationDir(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath()
                         , Utils.getFileName(item.getUri()))
                 .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -242,4 +292,5 @@ public class NormalActivity extends AppCompatActivity {
     private void showProgress(FileItem item, DownloadListener listener) {
         getDownloader(item, listener).showProgress();
     }
+
 }
