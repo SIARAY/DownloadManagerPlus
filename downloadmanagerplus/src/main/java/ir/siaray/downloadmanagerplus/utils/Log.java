@@ -2,14 +2,18 @@ package ir.siaray.downloadmanagerplus.utils;
 
 import java.lang.reflect.Field;
 
+import ir.siaray.downloadmanagerplus.BuildConfig;
+
 /**
  * Created by SIARAY on 15/12/2016.
  */
 
 public class Log {
-private static String TAG="DownloadManagerPlus";
+    private static String TAG = "DownloadManagerPlus";
+
     public static <T> void i(T msg) {
-        android.util.Log.i(TAG, "" + msg);
+        if (BuildConfig.DEBUG)
+            android.util.Log.i(TAG, "" + msg);
     }
 
     public static <T> void print(T msg) {

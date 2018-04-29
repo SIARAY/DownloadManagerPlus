@@ -120,6 +120,11 @@ public class Downloader {
         return this;
     }
 
+    private String getCorrectionDownloadDir() {
+        String storageDir = Environment.getExternalStorageDirectory().getPath();
+        return mDestinationDir.replaceFirst(storageDir, "");
+    }
+
 
     public Downloader setNotificationVisibility(int visibility) {
         mNotificationVisibility = visibility;
@@ -148,7 +153,7 @@ public class Downloader {
     }
 
     private boolean createDownloadDir() {
-        return mDestinationDir != null && Environment.getExternalStoragePublicDirectory(mDestinationDir).mkdirs();
+        return mDestinationDir != null && (new File(mDestinationDir).mkdirs());
     }
 
     public void start() {
@@ -187,7 +192,8 @@ public class Downloader {
         }
 
         if (!isValidDirectory(mDestinationDir)) {
-            mDestinationDir = Environment.DIRECTORY_DOWNLOADS;
+            Log.print("Directory is not valid, downloaded file will be save in default directory.");
+            mDestinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
             createDownloadDir();
             if (!isValidDirectory(mDestinationDir)) {
                 mListener.onFail(mPercent, DownloadReason.DESTINATION_DIRECTORY_NOT_FOUND, mTotalBytes, mDownloadedBytes);
@@ -224,7 +230,7 @@ public class Downloader {
             request.allowScanningByMediaScanner();
 
         if (!TextUtils.isEmpty(mDestinationDir) && !TextUtils.isEmpty(mFileName)) {
-            request.setDestinationInExternalPublicDir(mDestinationDir, mFileName);
+            request.setDestinationInExternalPublicDir(getCorrectionDownloadDir(), mFileName);
         }
 
         if (!TextUtils.isEmpty(mDescription)) {

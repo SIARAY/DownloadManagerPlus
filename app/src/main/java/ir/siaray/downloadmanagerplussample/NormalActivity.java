@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
-import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static ir.siaray.downloadmanagerplussample.MainActivity.DOWNLOAD_DIRECTORY;
 
 public class NormalActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -170,7 +169,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 .setScanningByMediaScanner(true)
                 .setNotificationVisibility(notificationVisibility)
                 .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
-                .setDestinationDir(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath()
+                .setDestinationDir(DOWNLOAD_DIRECTORY
                         , Utils.getFileName(item.getUri()))
                 .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {

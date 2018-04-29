@@ -3,6 +3,7 @@ package ir.siaray.downloadmanagerplussample;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private Downloader testDownload;
+    public static final String STORAGE_DIRECTORY = Environment.getExternalStorageDirectory().getPath();
+    public static final String DOWNLOAD_DIRECTORY = STORAGE_DIRECTORY + "/dmp";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +52,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.button2:
                 List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext());
-                if(list.size()>0) {
+                if (list.size() > 0) {
                     Utils.openFile(MainActivity.this, list.get(0).getLocalUri());
                     Toast.makeText(this, Log.printItems(list.get(0)), Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     Toast.makeText(this, "Download list is empty.", Toast.LENGTH_LONG).show();
                 }
                 //notifyThis("Notification Title", "Notification Message");
@@ -84,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nm.notify(1, b.build());
     }*/
-    private void showStatus(){
-        Log.i("statusssss: "+testDownload.getStatus("https://wallpaperbrowse.com/media/images/best-hd-wallpaper-download-12.jpg"));
+    private void showStatus() {
+        Log.i("statusssss: " + testDownload.getStatus("https://wallpaperbrowse.com/media/images/best-hd-wallpaper-download-12.jpg"));
     }
 
 }

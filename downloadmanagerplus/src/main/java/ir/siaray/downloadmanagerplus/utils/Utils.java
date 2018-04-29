@@ -248,6 +248,7 @@ public class Utils {
     public static boolean isValidDirectory(String dir) {
         if (!TextUtils.isEmpty(dir)) {
             File d = new File(dir);
+            d.mkdirs();
             if (d.isDirectory())
                 return true;
         }
