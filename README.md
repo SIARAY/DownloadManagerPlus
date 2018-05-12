@@ -29,8 +29,9 @@ Using faster and easier than Android Download Manager
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
      .setNotificationVisibility(visibility)
-     .setAllowedNetworkTypes(networkTypes)
-     .start();
+     .setAllowedNetworkTypes(networkTypes);
+     
+     downloader.start();
 
 ##### To view download status and progress that has already started.
 
