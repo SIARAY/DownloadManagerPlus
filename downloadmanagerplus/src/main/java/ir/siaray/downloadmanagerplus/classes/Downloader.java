@@ -51,8 +51,8 @@ public class Downloader {
     private DownloadStatus mDownloadStatus = DownloadStatus.CANCELED;
     private long mDownloadId;
     private int mPercent;
-    private int mDownloadedBytes;
-    private int mTotalBytes;
+    private int mDownloadedBytes = 0;
+    private int mTotalBytes = -1;
     private int mNotificationVisibility = DownloadManager
             .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
     private int mNetworkTypes = DownloadManager.Request.NETWORK_WIFI
@@ -60,7 +60,7 @@ public class Downloader {
     private boolean mScanningByMediaAllowed = false;
     private boolean mRoamingAllowed = false;
     private boolean mVisibleInDownloadsUi = true;
-    private boolean mMeteredAllowed = false;
+    private boolean mMeteredAllowed = true;
     private static DownloadManager downloadManager;
 
     public static Downloader getInstance(Context mContext) {
@@ -264,9 +264,17 @@ public class Downloader {
         mId = id;
         findDownloadHistory();
         if (mDownloadId > 0) {
+            Log.print("remove id: " + mDownloadId);
+            resetDownloadValues();
             downloadManager.remove(mDownloadId);
             Utils.deleteDownload(mContext, id);
         }
+    }
+
+    private void resetDownloadValues() {
+        mPercent = 0;
+        mDownloadedBytes = 0;
+        mTotalBytes = -1;
     }
 
     public boolean deleteFile(String id, ActionListener listener) {
@@ -436,7 +444,6 @@ public class Downloader {
                     if (!Utils.isFileExist(mLocalUri)) {
                         mDownloadStatus = DownloadStatus.CANCELED;
                         cancel(mId);
-
                     }
                     break;
                 default:

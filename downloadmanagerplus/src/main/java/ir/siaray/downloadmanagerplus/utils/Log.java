@@ -17,7 +17,7 @@ public class Log {
     }
 
     public static <T> void print(T msg) {
-        android.util.Log.i(TAG, "" + msg);
+        android.util.Log.e(TAG, "" + msg);
     }
 
     public static String printItems(Object obj) {

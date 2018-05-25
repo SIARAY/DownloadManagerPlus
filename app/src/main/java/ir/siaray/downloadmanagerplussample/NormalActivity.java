@@ -208,18 +208,18 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             DownloadStatus lastStatus = DownloadStatus.NONE;
 
             @Override
-            public void onComplete(int mTotalBytes) {
+            public void onComplete(int totalBytes) {
                 Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
                 numberProgressBar.setProgress(100);
                 lastStatus = DownloadStatus.SUCCESSFUL;
                 progressWheel.setVisibility(View.GONE);
-                tvSize.setText(Utils.readableFileSize(mTotalBytes)
-                        + "/" + Utils.readableFileSize(mTotalBytes) + " - Completed");
+                tvSize.setText(Utils.readableFileSize(totalBytes)
+                        + "/" + Utils.readableFileSize(totalBytes) + " - Completed");
             }
 
             @Override
-            public void onPause(int percent, DownloadReason reason, int mTotalBytes, int mDownloadedBytes) {
+            public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
                 if (lastStatus != DownloadStatus.PAUSED) {
                     Log.i("onPause - percent: " + percent
                             + " lastStatus:" + lastStatus
@@ -227,27 +227,27 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                     ivAction.setImageResource(R.mipmap.ic_cancel);
                     numberProgressBar.setProgress(percent);
                     progressWheel.setVisibility(View.VISIBLE);
-                    tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                            + "/" + Utils.readableFileSize(mTotalBytes) + " - Paused");
+                    tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                            + "/" + Utils.readableFileSize(totalBytes) + " - Paused");
                 }
                 lastStatus = DownloadStatus.PAUSED;
             }
 
             @Override
-            public void onPending(int percent, int mTotalBytes, int mDownloadedBytes) {
+            public void onPending(int percent, int totalBytes, int downloadedBytes) {
                 if (lastStatus != DownloadStatus.PENDING) {
                     Log.i("onPending - lastStatus:" + lastStatus);
                     ivAction.setImageResource(R.mipmap.ic_cancel);
                     numberProgressBar.setProgress(percent);
                     progressWheel.setVisibility(View.VISIBLE);
-                    tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                            + "/" + Utils.readableFileSize(mTotalBytes) + " - Pending");
+                    tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                            + "/" + Utils.readableFileSize(totalBytes) + " - Pending");
                 }
                 lastStatus = DownloadStatus.PENDING;
             }
 
             @Override
-            public void onFail(int percent, DownloadReason reason, int mTotalBytes, int mDownloadedBytes) {
+            public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
                 Toast.makeText(NormalActivity.this, "Failed: " + reason, Toast.LENGTH_SHORT).show();
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
@@ -256,33 +256,34 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 numberProgressBar.setProgress(0);
                 lastStatus = DownloadStatus.FAILED;
                 progressWheel.setVisibility(View.GONE);
-                tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                        + "/" + Utils.readableFileSize(mTotalBytes) + " - Failed");
+                tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                        + "/" + Utils.readableFileSize(totalBytes) + " - Failed");
 
             }
 
             @Override
-            public void onCancel(int mTotalBytes, int mDownloadedBytes) {
+            public void onCancel(int totalBytes, int downloadedBytes) {
                 Log.i("onCancel");
                 ivAction.setImageResource(R.mipmap.ic_start);
                 numberProgressBar.setProgress(0);
                 lastStatus = DownloadStatus.CANCELED;
                 progressWheel.setVisibility(View.GONE);
-                tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                        + "/" + Utils.readableFileSize(mTotalBytes) + " - Canceled");
+                tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                        + "/" + Utils.readableFileSize(totalBytes) + " - Canceled");
             }
 
             @Override
-            public void onRunning(int percent, int mTotalBytes, int mDownloadedBytes) {
+            public void onRunning(int percent, int totalBytes, int downloadedBytes) {
+                //Log.i("percent: "+percent);
                 ivAction.setImageResource(R.mipmap.ic_cancel);
                 numberProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;
                 progressWheel.setVisibility(View.GONE);
-                if (mTotalBytes < 0 || mDownloadedBytes < 0)
+                if (totalBytes < 0 || downloadedBytes < 0)
                     tvSize.setText("loading...");
                 else
-                    tvSize.setText(Utils.readableFileSize(mDownloadedBytes)
-                            + "/" + Utils.readableFileSize(mTotalBytes));
+                    tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                            + "/" + Utils.readableFileSize(totalBytes));
             }
 
         };

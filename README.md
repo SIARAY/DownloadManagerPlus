@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'ir.siaray:downloadmanagerplus:1.2.4'
+        compile 'ir.siaray:downloadmanagerplus:1.2.5'
     }
 
 ## Usage
@@ -29,8 +29,9 @@ Using faster and easier than Android Download Manager
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
      .setNotificationVisibility(visibility)
-     .setAllowedNetworkTypes(networkTypes)
-     .start();
+     .setAllowedNetworkTypes(networkTypes);
+     
+    downloader.start();
 
 ##### To view download status and progress that has already started.
 
@@ -54,6 +55,7 @@ Using faster and easier than Android Download Manager
     Downloader.getDownloadId(context, id);
 
 ##### Get download plus id.
+> `downloadId parameter is android download manager id`
 
     Downloader.getId(context, downloadId);
 
