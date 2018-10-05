@@ -1,8 +1,10 @@
 package ir.siaray.downloadmanagerplus.model;
 
 import android.app.DownloadManager;
+import android.net.Uri;
 
 import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
 /**
@@ -19,7 +21,7 @@ public class DownloadItem {
     private DownloadStatus downloadStatus;
     private int reason;
     private String localUri;
-    private String localFileName;
+    private String localFilePath;
     private String description;
     private long lastTimeModified;
     private String mediaType;
@@ -35,7 +37,7 @@ public class DownloadItem {
         setDownloadedBytes(downloadItem.getDownloadedBytes());
         setDownloadId(downloadItem.getDownloadId());
         setDownloadStatus(downloadItem.getDownloadStatus());
-        setLocalFileName(downloadItem.getLocalFileName());
+        setLocalFilePath(downloadItem.getFilePath());
         setLocalUri(downloadItem.getLocalUri());
         setReason(downloadItem.getReason());
         setTotalBytes(downloadItem.getTotalBytes());
@@ -126,20 +128,27 @@ public class DownloadItem {
     }
 
     public void setLocalUri(String localUri) {
+        localFilePath = getFilePathFromUri(localUri);
         this.localUri = localUri;
+        Log.i("### localFilePath: "+ localFilePath);
+        Log.i("### localUri: "+localUri);
     }
 
-    @Deprecated
-    /**
-     * This method is Deprecated
-     * Instead, use the getLocalUri() method
-     */
-    public String getLocalFileName() {
-        return localFileName;
+    private String getFilePathFromUri(String localUri) {
+        if (localUri != null) {
+            Uri fileUri = Uri.parse(localUri);
+            return fileUri.getPath();
+        }
+        return null;
     }
 
-    public void setLocalFileName(String localFileName) {
-        this.localFileName = localFileName;
+
+    public String getFilePath() {
+        return localFilePath;
+    }
+
+    public void setLocalFilePath(String localFilePath) {
+        this.localFilePath = localFilePath;
     }
 
     public String getDescription() {

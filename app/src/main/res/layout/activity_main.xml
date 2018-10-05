@@ -11,40 +11,56 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.siaray.downloadmanagerplussample.ir.siaray.downloadmanagerplussample.MainActivity">
-
+    tools:context="ir.siaray.downloadmanagerplussample.MainActivity">
 
     <Button
         android:id="@+id/button1"
-        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="#1cc65d"
         android:gravity="center"
-        android:text="Download" />
+        android:text="Downloads Page"
+        android:textColor="#ffffff"
+        android:textSize="17sp" />
 
     <Button
         android:id="@+id/button2"
         style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:backgroundTint="#de0a65"
         android:gravity="center"
         android:text="Get first download item in list"
+        android:textColor="#ffffff"
+        android:textSize="17sp"
         android:visibility="visible" />
 
     <Button
         android:id="@+id/button3"
         style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
+        android:backgroundTint="#1b81ed"
         android:gravity="center"
-        android:text="Show Downloads" />
+        android:text="Show Downloaded Files"
+        android:textColor="#ffffff"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lib version"
+        android:textColor="#efefef"
+        android:layout_marginTop="50dp"
+        android:textSize="19sp" />
 
 </LinearLayout>

@@ -67,7 +67,9 @@ public class Downloader {
         return (new Downloader(mContext));
     }
 
-    public static DownloadManager getDownloadManager() {
+    public static DownloadManager getDownloadManager(Context context) {
+        if(downloadManager==null)
+            setDownloadManager(context);
         return downloadManager;
     }
 
@@ -554,7 +556,7 @@ public class Downloader {
         DownloadManager.Query q = new DownloadManager.Query();
         //q.setFilterById(downloadId);
 
-        final Cursor cursor = downloadManager.query(q);
+        final Cursor cursor = getDownloadManager(context).query(q);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
@@ -583,7 +585,7 @@ public class Downloader {
         DownloadManager.Query q = new DownloadManager.Query();
         q.setFilterById(downloadId);
 
-        final Cursor cursor = downloadManager.query(q);
+        final Cursor cursor = getDownloadManager(context).query(q);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             downloadItem = fetchDownloadItem(context, cursor);
@@ -604,8 +606,8 @@ public class Downloader {
                 , DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
         downloadItem.setTotalBytes(Utils.getColumnInt(cursor
                 , DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-        downloadItem.setLocalFileName(Utils.getColumnString(cursor
-                , DownloadManager.COLUMN_LOCAL_FILENAME));
+        //downloadItem.setLocalFilePath(Utils.getColumnString(cursor
+                //, DownloadManager.COLUMN_LOCAL_FILENAME));
         downloadItem.setLocalUri(Utils.getColumnString(cursor
                 , DownloadManager.COLUMN_LOCAL_URI));
         downloadItem.setUri(Utils.getColumnString(cursor

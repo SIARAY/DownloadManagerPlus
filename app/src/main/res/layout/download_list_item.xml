@@ -3,42 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#efefef">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentTop="true"
+        android:layout_height="100dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="1.5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1.5dp"
+        android:background="@drawable/item_background_shape">
 
         <RelativeLayout
             android:id="@+id/btn_action"
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:background="@color/colorAccent">
+            android:layout_marginRight="15dp"
+            android:background="@drawable/download_button_background_shape">
 
             <ImageView
                 android:id="@+id/iv_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:padding="26dp"
+                android:padding="22dp"
                 android:src="@mipmap/ic_start" />
 
             <com.pnikosis.materialishprogress.ProgressWheel
                 android:id="@+id/progress_wheel"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
                 android:layout_centerInParent="true"
                 android:visibility="gone"
                 app:matProg_barColor="#ffffff"
                 app:matProg_barWidth="3dp"
-                app:matProg_spinSpeed="0.5"
                 app:matProg_fillRadius="true"
-                app:matProg_progressIndeterminate="true" />
+                app:matProg_progressIndeterminate="true"
+                app:matProg_spinSpeed="0.5" />
 
         </RelativeLayout>
 
@@ -47,34 +52,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
             android:layout_toLeftOf="@+id/btn_delete"
             android:layout_toRightOf="@+id/btn_action"
             android:gravity="left"
-            android:maxLines="1"
-            android:padding="10dp"
-            android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:textColor="#000"
-            android:textSize="12dp" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tv_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_name"
+            android:layout_marginTop="0dp"
             android:layout_toLeftOf="@+id/btn_delete"
             android:layout_toRightOf="@+id/btn_action"
-            android:layout_below="@+id/tv_name"
             android:gravity="left"
             android:maxLines="1"
+            android:paddingLeft="0dp"
             android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:layout_marginTop="0dp"
             android:textColor="#888"
-            android:textSize="10dp" />
+            android:textSize="12sp" />
 
         <RelativeLayout
             android:id="@+id/btn_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_margin="3dp"
             android:layout_alignParentRight="true">
 
             <ImageView
@@ -82,12 +89,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:padding="7dp"
-                android:src="@drawable/ic_delete_red_400_24dp" />
+                android:padding="9dp"
+                android:src="@mipmap/ic_delete" />
 
         </RelativeLayout>
 
-        <com.daimajia.numberprogressbar.NumberProgressBar
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="15dp"
+            android:layout_toRightOf="@+id/btn_action">
+
+            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="match_parent"
+                android:layout_toLeftOf="@+id/tv_percent"
+                android:layout_height="4dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                app:rcBackgroundColor="#CCCCCC"
+                app:rcBackgroundPadding="0dp"
+                app:rcMax="100"
+                app:rcProgress="0"
+                app:rcProgressColor="@color/colorAccent"
+                app:rcRadius="10dp"
+                app:rcSecondaryProgress="0"
+                app:rcSecondaryProgressColor="#dddddd" />
+
+            <TextView
+                android:id="@+id/tv_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:maxLines="1"
+                android:gravity="center"
+                android:layout_marginBottom="2dp"
+                android:text="0%"
+                android:textColor="@color/colorAccent"
+                android:textSize="12sp" />
+        </RelativeLayout>
+        <!--<com.daimajia.numberprogressbar.NumberProgressBar
             android:id="@+id/progressbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,19 +140,20 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_toRightOf="@+id/btn_action"
-            app:progress_reached_bar_height="3dp"
+            app:progress_reached_bar_height="16dp"
             app:progress_reached_color="@color/colorAccent"
             app:progress_text_color="@color/colorAccent"
             app:progress_text_offset="1dp"
             app:progress_text_size="10sp"
+            style="@style/NumberProgressBar_Default"
             app:progress_text_visibility="visible"
             app:progress_unreached_bar_height="3dp"
-            app:progress_unreached_color="#CCCCCC" />
+            app:progress_unreached_color="#CCCCCC" />-->
 
-        <View
+        <!--<View
             android:layout_width="match_parent"
             android:layout_height="1.5dp"
             android:layout_alignParentTop="true"
-            android:background="@color/appBackground" />
+            android:background="@color/appBackground" />-->
     </RelativeLayout>
 </RelativeLayout>

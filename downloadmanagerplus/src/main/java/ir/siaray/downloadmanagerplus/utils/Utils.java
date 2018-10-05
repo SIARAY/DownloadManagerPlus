@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.text.DecimalFormat;
 
+import ir.siaray.downloadmanagerplus.BuildConfig;
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 
 /**
@@ -33,7 +35,10 @@ public class Utils {
         if (url == null)
             return;
         url = Uri.parse(url).getPath();
-        Uri uri = Uri.fromFile(new File(url));
+        //Uri uri = Uri.fromFile(new File(url));
+        Uri uri = FileProvider.getUriForFile(context
+                , "ir.siaray.downloadmanagerplus.fileProvider"
+                ,new File(url));
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -79,6 +84,7 @@ public class Utils {
             intent.setDataAndType(uri, "*/*");
         }
 
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

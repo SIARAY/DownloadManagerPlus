@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
@@ -110,17 +111,24 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
         final ViewGroup btnDelete = (ViewGroup) view.findViewById(R.id.btn_delete);
         TextView tvName = (TextView) view.findViewById(R.id.tv_name);
         TextView tvSize = (TextView) view.findViewById(R.id.tv_size);
+        TextView tvPercent = (TextView) view.findViewById(R.id.tv_percent);
         ProgressWheel progressWheel = (ProgressWheel) view.findViewById(R.id.progress_wheel);
-        final NumberProgressBar numberProgressBar = (NumberProgressBar) view.findViewById(R.id.progressbar);
+        //final NumberProgressBar numberProgressBar = (NumberProgressBar) view.findViewById(R.id.progressbar);
+        final RoundCornerProgressBar downloadProgressBar = (RoundCornerProgressBar) view.findViewById(R.id.progressbar);
 
         tvName.setText(Utils.getFileName(item.getUri()));
 
         final ActionListener deleteListener = getDeleteListener(ivAction
                 , btnAction
-                , numberProgressBar
+                , downloadProgressBar
                 , progressWheel
-                , tvSize);
-        item.setListener(getDownloadListener(ivAction, numberProgressBar, progressWheel, tvSize));
+                , tvSize
+                , tvPercent);
+        item.setListener(getDownloadListener(ivAction
+                , downloadProgressBar
+                , progressWheel
+                , tvSize
+                , tvPercent ));
 
         //Download Button
         btnAction.setOnClickListener(new View.OnClickListener() {
@@ -180,15 +188,17 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
 
     private ActionListener getDeleteListener(final ImageView ivAction
             , final ViewGroup btnDelete
-            , final NumberProgressBar numberProgressBar
+            , final RoundCornerProgressBar downloadProgressBar
             , ProgressWheel progressWheel
-            , final TextView tvSize) {
+            , final TextView tvSize
+            , final TextView tvPercent) {
         return new ActionListener() {
             @Override
             public void onSuccess() {
                 ivAction.setImageResource(R.mipmap.ic_start);
-                numberProgressBar.setProgress(0);
+                downloadProgressBar.setProgress(0);
                 tvSize.setText(" Deleted");
+                tvPercent.setText("0%");
                 Toast.makeText(NormalActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
             }
 
@@ -201,9 +211,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
     }
 
     private DownloadListener getDownloadListener(final ImageView ivAction
-            , final NumberProgressBar numberProgressBar
+            , final RoundCornerProgressBar downloadProgressBar
             , final ProgressWheel progressWheel
-            , final TextView tvSize) {
+            , final TextView tvSize
+            , final TextView tvPercent) {
         return new DownloadListener() {
             DownloadStatus lastStatus = DownloadStatus.NONE;
 
@@ -211,9 +222,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             public void onComplete(int totalBytes) {
                 Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
-                numberProgressBar.setProgress(100);
+                downloadProgressBar.setProgress(100);
                 lastStatus = DownloadStatus.SUCCESSFUL;
                 progressWheel.setVisibility(View.GONE);
+                tvPercent.setText("100%");
                 tvSize.setText(Utils.readableFileSize(totalBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Completed");
             }
@@ -225,8 +237,9 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                             + " lastStatus:" + lastStatus
                             + " reason:" + reason);
                     ivAction.setImageResource(R.mipmap.ic_cancel);
-                    numberProgressBar.setProgress(percent);
+                    downloadProgressBar.setProgress(percent);
                     progressWheel.setVisibility(View.VISIBLE);
+                    tvPercent.setText(percent+"%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Paused");
                 }
@@ -238,8 +251,9 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 if (lastStatus != DownloadStatus.PENDING) {
                     Log.i("onPending - lastStatus:" + lastStatus);
                     ivAction.setImageResource(R.mipmap.ic_cancel);
-                    numberProgressBar.setProgress(percent);
+                    downloadProgressBar.setProgress(percent);
                     progressWheel.setVisibility(View.VISIBLE);
+                    tvPercent.setText(percent+"%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Pending");
                 }
@@ -253,9 +267,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                         + " lastStatus:" + lastStatus
                         + " reason:" + reason);
                 ivAction.setImageResource(R.mipmap.ic_start);
-                numberProgressBar.setProgress(0);
+                downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.FAILED;
                 progressWheel.setVisibility(View.GONE);
+                tvPercent.setText(percent+"%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Failed");
 
@@ -265,9 +280,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             public void onCancel(int totalBytes, int downloadedBytes) {
                 Log.i("onCancel");
                 ivAction.setImageResource(R.mipmap.ic_start);
-                numberProgressBar.setProgress(0);
+                downloadProgressBar.setProgress(0);
                 lastStatus = DownloadStatus.CANCELED;
                 progressWheel.setVisibility(View.GONE);
+                tvPercent.setText("0%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Canceled");
             }
@@ -276,9 +292,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             public void onRunning(int percent, int totalBytes, int downloadedBytes) {
                 //Log.i("percent: "+percent);
                 ivAction.setImageResource(R.mipmap.ic_cancel);
-                numberProgressBar.setProgress(percent);
+                downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;
                 progressWheel.setVisibility(View.GONE);
+                tvPercent.setText(percent+"%");
                 if (totalBytes < 0 || downloadedBytes < 0)
                     tvSize.setText("loading...");
                 else

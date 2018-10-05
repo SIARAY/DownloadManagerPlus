@@ -22,7 +22,8 @@ public class SampleUtils {
             item.setUri(link);
         } else if (number == 2) {
             item.setId("id1249");
-            String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
+            //String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
+            String link = "https://hw7.cdn.asset.aparat.com/aparat-video/8752c8e2a411ce9e486f37983f21017411515047-360p__95568.mp4";
             item.setUri(link);
         } else {
             item.setId("id1280");

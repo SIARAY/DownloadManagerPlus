@@ -7,6 +7,16 @@
         android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <application android:allowBackup="true" android:label="@string/app_name"
         android:supportsRtl="true">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="ir.siaray.downloadmanagerplus.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>
