@@ -4,7 +4,7 @@ Using faster and easier than Android Download Manager
 
 ## Screenshots
 
-![Screenshot](https://github.com/SIARAY/DownloadManagerPlus/tree/master/art/downloadmanagerplus-v1.1.1.gif)
+![Screenshot](https://raw.githubusercontent.com/SIARAY/DownloadManagerPlus/master/art/downloadmanagerplus-v1.1.1.gif)
 
 ## Getting started
 
