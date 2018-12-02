@@ -9,7 +9,7 @@ import ir.siaray.downloadmanagerplus.BuildConfig;
  */
 
 public class Log {
-    private static String TAG = "DownloadManagerPlus";
+    private static String TAG = "DownloadManagerPlusTag";
 
     public static <T> void i(T msg) {
         if (BuildConfig.DEBUG)

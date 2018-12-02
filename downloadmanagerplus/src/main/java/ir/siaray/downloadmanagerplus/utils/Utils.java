@@ -31,60 +31,66 @@ public class Utils {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
     }
 
-    public static void openFile(Context context, String url) {
-        if (url == null)
-            return;
-        url = Uri.parse(url).getPath();
-        //Uri uri = Uri.fromFile(new File(url));
-        Uri uri = FileProvider.getUriForFile(context
-                , "ir.siaray.downloadmanagerplus.fileProvider"
-                ,new File(url));
+    public static void openFile(Context context, String path) {
+        openFile(context, path, null);
+    }
 
+    public static void openFile(Context context, String path, Uri providerUri) {
+        if (path == null)
+            return;
+        path = Uri.parse(path).getPath().toLowerCase();
+        //Uri uri = Uri.fromFile(new File(path));
+        Uri uri = providerUri;
+        if (providerUri == null)
+            uri = FileProvider.getUriForFile(context
+                    , context.getPackageName() + ".fileProvider"
+                    , new File(path));
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        if (url.contains(".doc") || url.contains(".docx")) {
+        if (path.contains(".doc")
+                || path.contains(".docx")) {
             // Word document
             intent.setDataAndType(uri, "application/msword");
-        } else if (url.contains(".pdf")) {
+        } else if (path.contains(".pdf")) {
             // PDF file
             intent.setDataAndType(uri, "application/pdf");
-        } else if (url.contains(".ppt") || url.contains(".pptx")) {
+        } else if (path.contains(".ppt") || path.contains(".pptx")) {
             // Powerpoint file
             intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
-        } else if (url.contains(".xls") || url.contains(".xlsx")) {
+        } else if (path.contains(".xls") || path.contains(".xlsx")) {
             // Excel file
             intent.setDataAndType(uri, "application/vnd.ms-excel");
-        } else if (url.contains(".zip") || url.contains(".rar")) {
+        } else if (path.contains(".zip") || path.contains(".rar")) {
             // zip file
             intent.setDataAndType(uri, "application/zip");
-        } else if (url.contains(".rtf")) {
+        } else if (path.contains(".rtf")) {
             // RTF file
             intent.setDataAndType(uri, "application/rtf");
-        } else if (url.contains(".wav") || url.contains(".mp3")) {
+        } else if (path.contains(".wav") || path.contains(".mp3")) {
             // WAV audio file
             intent.setDataAndType(uri, "audio/x-wav");
-        } else if (url.contains(".gif")) {
+        } else if (path.contains(".gif")) {
             // GIF file
             intent.setDataAndType(uri, "image/gif");
-        } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".png")) {
+        } else if (path.contains(".jpg") || path.contains(".jpeg") || path.contains(".png")) {
             // JPG file
             intent.setDataAndType(uri, "image/jpeg");
-        } else if (url.contains(".txt")) {
+        } else if (path.contains(".txt")) {
             // Text file
             intent.setDataAndType(uri, "text/plain");
-        } else if (url.contains(".3gp")
-                || url.contains(".mpg")
-                || url.contains(".mpeg")
-                || url.contains(".mpe")
-                || url.contains(".mp4")
-                || url.contains(".avi")) {
+        } else if (path.contains(".3gp")
+                || path.contains(".mpg")
+                || path.contains(".mpeg")
+                || path.contains(".mpe")
+                || path.contains(".mp4")
+                || path.contains(".avi")) {
             // Video files
             intent.setDataAndType(uri, "video/*");
         } else {
             intent.setDataAndType(uri, "*/*");
         }
 
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
