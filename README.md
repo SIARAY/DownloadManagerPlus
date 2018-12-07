@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'ir.siaray:downloadmanagerplus:1.2.7'
+        compile 'ir.siaray:downloadmanagerplus:1.2.8'
     }
 
 ## Usage

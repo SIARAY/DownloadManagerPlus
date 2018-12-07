@@ -42,9 +42,14 @@ public class Utils {
         //Uri uri = Uri.fromFile(new File(path));
         Uri uri = providerUri;
         if (providerUri == null)
-            uri = FileProvider.getUriForFile(context
-                    , context.getPackageName() + ".fileProvider"
-                    , new File(path));
+            try {
+                uri = FileProvider.getUriForFile(context
+                        , context.getPackageName() + ".fileProvider"
+                        , new File(path));
+            } catch (Exception e) {
+                Log.print("FileProvider not found. Please declare your FileProvider in manifest.");
+                return;
+            }
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
         if (path.contains(".doc")
