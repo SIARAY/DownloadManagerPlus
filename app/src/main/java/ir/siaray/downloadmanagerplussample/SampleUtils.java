@@ -1,7 +1,9 @@
 package ir.siaray.downloadmanagerplussample;
 
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -129,4 +131,9 @@ public class SampleUtils {
         }.execute();
     }
 
+    public static String getFileType(String url) {
+        if (url == null || !url.contains("."))
+            return null;
+        return url.substring(url.lastIndexOf('.'), url.length());
+    }
 }

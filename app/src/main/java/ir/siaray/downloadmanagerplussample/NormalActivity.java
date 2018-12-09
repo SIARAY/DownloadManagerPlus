@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
-import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import ir.siaray.downloadmanagerplus.classes.Downloader;

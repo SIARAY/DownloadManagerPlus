@@ -68,7 +68,7 @@ public class Downloader {
     }
 
     public static DownloadManager getDownloadManager(Context context) {
-        if(downloadManager==null)
+        if (downloadManager == null)
             setDownloadManager(context);
         return downloadManager;
     }
@@ -342,8 +342,8 @@ public class Downloader {
                     final boolean[] continuous = {true};
                     do {
                         if (mContext != null) {
+                            getDownloadStatusWithReason();
                             if (mContext instanceof Activity) {
-                                getDownloadStatusWithReason();
                                 ((Activity) mContext).runOnUiThread(new Runnable() {
 
                                     @Override
@@ -351,33 +351,16 @@ public class Downloader {
                                         if (!continuous[0])
                                             return;
                                         //String message = statusMessage();
-                                        switch (mDownloadStatus) {
-                                            case SUCCESSFUL:
-                                                mListener.onComplete(mTotalBytes);
-                                                break;
-                                            case PAUSED:
-                                                mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
-                                                break;
-                                            case PENDING:
-                                                mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
-                                                break;
-                                            case FAILED:
-                                                mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
-                                                break;
-                                            case CANCELED:
-                                                continuous[0] = false;
-                                                mListener.onCancel(mTotalBytes, mDownloadedBytes);
-                                                break;
-                                            default://Running
-                                                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
-                                                break;
-                                        }
+                                        returnDownloadResponse(continuous);
                                     }
                                 });
                             } else {
-                                continuous[0] = false;
-                                Log.print("Use activity context for update ui." +
-                                        "Use this in activity or getActivity in fragment");
+                                //continuous[0] = false;
+                                if (!continuous[0])
+                                    return;
+                                returnDownloadResponse(continuous);
+                                //Log.print("Use activity context for update ui." +
+                                //"Use this in activity or getActivity in fragment");
                             }
                         } else {
                             Log.print("Context is null.");
@@ -401,6 +384,30 @@ public class Downloader {
             Utils.removeFromThreadList(mId);
             Utils.addToThreadList(mId, thread);
             thread.start();
+        }
+    }
+
+    private void returnDownloadResponse(boolean[] continuous) {
+        switch (mDownloadStatus) {
+            case SUCCESSFUL:
+                mListener.onComplete(mTotalBytes);
+                break;
+            case PAUSED:
+                mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                break;
+            case PENDING:
+                mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
+                break;
+            case FAILED:
+                mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                break;
+            case CANCELED:
+                continuous[0] = false;
+                mListener.onCancel(mTotalBytes, mDownloadedBytes);
+                break;
+            default://Running
+                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
+                break;
         }
     }
 
@@ -607,7 +614,7 @@ public class Downloader {
         downloadItem.setTotalBytes(Utils.getColumnInt(cursor
                 , DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
         //downloadItem.setLocalFilePath(Utils.getColumnString(cursor
-                //, DownloadManager.COLUMN_LOCAL_FILENAME));
+        //, DownloadManager.COLUMN_LOCAL_FILENAME));
         downloadItem.setLocalUri(Utils.getColumnString(cursor
                 , DownloadManager.COLUMN_LOCAL_URI));
         downloadItem.setUri(Utils.getColumnString(cursor
