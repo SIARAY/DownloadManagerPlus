@@ -13,7 +13,7 @@ import ir.siaray.downloadmanagerplus.utils.Utils;
 
 public class DownloadItem {
 
-    private String id;
+    private String token;
     private int percent;
     private long downloadId;
     private int downloadedBytes;
@@ -29,7 +29,7 @@ public class DownloadItem {
     private String uri;
 
     public DownloadItem(DownloadItem downloadItem) {
-        setId(downloadItem.getId());
+        setToken(downloadItem.getToken());
         setTitle(downloadItem.getTitle());
         setMediaType(downloadItem.getMediaType());
         setLastTimeModified(downloadItem.getLastTimeModified());
@@ -49,12 +49,12 @@ public class DownloadItem {
 
     }
 
-    public String getId() {
-        return id;
+    public String getToken() {
+        return token;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public long getDownloadId() {

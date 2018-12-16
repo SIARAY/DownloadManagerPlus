@@ -19,16 +19,16 @@ public class SampleUtils {
         FileItem item = new FileItem();
 
         if (number == 1) {
-            item.setId("id1245");
+            item.setToken("id1245");
             String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
             item.setUri(link);
         } else if (number == 2) {
-            item.setId("id1249");
+            item.setToken("id1249");
             //String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
             String link = "https://hw7.cdn.asset.aparat.com/aparat-video/8752c8e2a411ce9e486f37983f21017411515047-360p__95568.mp4";
             item.setUri(link);
         } else {
-            item.setId("id1280");
+            item.setToken("id1280");
             String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
             item.setUri(link);
         }
@@ -38,7 +38,7 @@ public class SampleUtils {
     public static void getFileList(List<FileItem> list, int number) {
         for (int i = 0; i < number; i++) {
             FileItem item = new FileItem();
-            item.setId("" + i);
+            item.setToken("" + i);
             String link = "";
             switch (i % 12) {
                 case 0:

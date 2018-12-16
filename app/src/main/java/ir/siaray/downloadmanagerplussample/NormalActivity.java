@@ -82,9 +82,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
     }
 
     private void inflateUi() {
-        Log.i("drop down:" + notificationVisibility);
         ViewGroup itemContainer = findViewById(R.id.item_container);
-        //LinearLayout parent = (LinearLayout) findViewById(R.id.main_container);
         View fView = getLayoutInflater().inflate(R.layout.download_list_item, null);
         itemContainer.addView(fView);
         FileItem fItem = SampleUtils.getDownloadItem(1);
@@ -105,15 +103,14 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
     }
 
     private void initUi(View view, final FileItem item) {
-        final ImageView ivAction = (ImageView) view.findViewById(R.id.iv_image);
-        final ViewGroup btnAction = (ViewGroup) view.findViewById(R.id.btn_action);
-        final ViewGroup btnDelete = (ViewGroup) view.findViewById(R.id.btn_delete);
-        TextView tvName = (TextView) view.findViewById(R.id.tv_name);
-        TextView tvSize = (TextView) view.findViewById(R.id.tv_size);
-        TextView tvPercent = (TextView) view.findViewById(R.id.tv_percent);
-        ProgressWheel progressWheel = (ProgressWheel) view.findViewById(R.id.progress_wheel);
-        //final NumberProgressBar numberProgressBar = (NumberProgressBar) view.findViewById(R.id.progressbar);
-        final RoundCornerProgressBar downloadProgressBar = (RoundCornerProgressBar) view.findViewById(R.id.progressbar);
+        final ImageView ivAction = view.findViewById(R.id.iv_image);
+        final ViewGroup btnAction = view.findViewById(R.id.btn_action);
+        final ViewGroup btnDelete = view.findViewById(R.id.btn_delete);
+        TextView tvName = view.findViewById(R.id.tv_name);
+        TextView tvSize = view.findViewById(R.id.tv_size);
+        TextView tvPercent = view.findViewById(R.id.tv_percent);
+        ProgressWheel progressWheel = view.findViewById(R.id.progress_wheel);
+        final RoundCornerProgressBar downloadProgressBar = view.findViewById(R.id.progressbar);
 
         tvName.setText(Utils.getFileName(item.getUri()));
 
@@ -148,19 +145,19 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                         .setUrl(item.getUri())
                         .setListener(item.getListener());
 
-                downloader.deleteFile(item.getId(), deleteListener);
+                downloader.deleteFile(item.getToken(), deleteListener);
             }
         });
     }
 
     private void clickOnActionButton(FileItem item) {
         final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
-        if (downloader.getStatus(item.getId()) == DownloadStatus.RUNNING
-                || downloader.getStatus(item.getId()) == DownloadStatus.PAUSED
-                || downloader.getStatus(item.getId()) == DownloadStatus.PENDING)
-            downloader.cancel(item.getId());
-        else if (downloader.getStatus(item.getId()) == DownloadStatus.SUCCESSFUL) {
-            Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getId()));
+        if (downloader.getStatus(item.getToken()) == DownloadStatus.RUNNING
+                || downloader.getStatus(item.getToken()) == DownloadStatus.PAUSED
+                || downloader.getStatus(item.getToken()) == DownloadStatus.PENDING)
+            downloader.cancel(item.getToken());
+        else if (downloader.getStatus(item.getToken()) == DownloadStatus.SUCCESSFUL) {
+            Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getToken()));
         } else
             downloader.start();
     }
@@ -169,7 +166,8 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
         Downloader request = Downloader.getInstance(this)
                 .setListener(listener)
                 .setUrl(item.getUri())
-                .setId(item.getId())
+                .setToken(item.getToken())
+                .setKeptAllDownload(false)//if true: canceled download token keep in db
                 .setAllowedOverRoaming(true)
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))

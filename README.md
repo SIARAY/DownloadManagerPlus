@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'ir.siaray:downloadmanagerplus:1.2.7'
+        compile 'ir.siaray:downloadmanagerplus:1.2.8'
     }
 
 ## Usage
@@ -21,7 +21,7 @@ Using faster and easier than Android Download Manager
     Downloader downloader = Downloader.getInstance(context)
      .setUrl(url)
      .setListener(listener)
-     .setId(id)
+     .setToken(token)
      .setAllowedOverRoaming(roamingAllowed)
      .setAllowedOverMetered(meteredAllowed) //Api 16 and higher
      .setVisibleInDownloadsUi(isVisible)
@@ -29,7 +29,8 @@ Using faster and easier than Android Download Manager
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
      .setNotificationVisibility(visibility)
-     .setAllowedNetworkTypes(networkTypes);
+     .setAllowedNetworkTypes(networkTypes)
+     .setKeptAllDownload(true);
      
     downloader.start();
 
@@ -38,30 +39,29 @@ Using faster and easier than Android Download Manager
     downloader.showProgress();
 
 ##### To cancel a download.
-> `id parameter is download plus id`
 
-    downloader.cancel(id);
+    downloader.cancel(token);
 
 ##### Detect download status.
 
-    downloader.getStatus(id);
+    downloader.getStatus(token);
 
 ##### Delete the downloaded file.
 
-    downloader.deleteFile(id, deleteListener);
+    downloader.deleteFile(token, deleteListener);
 
 ##### Get download id.
 
-    Downloader.getDownloadId(context, id);
+    Downloader.getDownloadId(context, token);
 
-##### Get download plus id.
+##### Get download plus token.
 > `downloadId parameter is android download manager id`
 
-    Downloader.getId(context, downloadId);
+    Downloader.getToken(context, downloadId);
 
 ##### Get download item.
 
-    Downloader.getDownloadItem(context, id);
+    Downloader.getDownloadItem(context, token);
 
 ##### Get downloads list.
 

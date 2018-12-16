@@ -45,7 +45,7 @@ public class Downloader {
     private String mDestinationDir;
     private String mDescription;
     private DownloadReason mReason;
-    private String mId = null;
+    private String mToken = null;
     private String mLocalUri;
     private DownloadListener mListener;
     private DownloadStatus mDownloadStatus = DownloadStatus.CANCELED;
@@ -62,6 +62,7 @@ public class Downloader {
     private boolean mVisibleInDownloadsUi = true;
     private boolean mMeteredAllowed = true;
     private static DownloadManager downloadManager;
+    private boolean mAllDownloadKept = false;
 
     public static Downloader getInstance(Context mContext) {
         return (new Downloader(mContext));
@@ -85,8 +86,8 @@ public class Downloader {
         }
     }
 
-    public Downloader setId(String id) {
-        mId = id;
+    public Downloader setToken(String token) {
+        mToken = token;
         return this;
     }
 
@@ -188,9 +189,9 @@ public class Downloader {
             return true;
         }
 
-        if (isIdEmpty(mId)) {
-            Log.print("id can not be null");
-            mId = mUrl;
+        if (isIdEmpty(mToken)) {
+            Log.print("Token can not be null");
+            mToken = mUrl;
         }
 
         if (!isValidDirectory(mDestinationDir)) {
@@ -243,33 +244,35 @@ public class Downloader {
             request.setAllowedOverMetered(mMeteredAllowed);
         }
 
-        cancel(mId);
+        cancel(mToken);
         mDownloadId = downloadManager.enqueue(request);
 
-        Utils.updateDB(mContext, mId, mUrl, mDownloadId);
+        Utils.updateDB(mContext, mToken, mUrl, mDownloadId);
         showProgress();
     }
 
     private boolean isDownloadRunning() {
-        mDownloadStatus = getStatus(mId);
+        mDownloadStatus = getStatus(mToken);
         return mDownloadStatus == DownloadStatus.RUNNING
                 || mDownloadStatus == DownloadStatus.PENDING
                 || mDownloadStatus == DownloadStatus.PAUSED
                 || mDownloadStatus == DownloadStatus.SUCCESSFUL;
     }
 
-    public void cancel(String id) {
-        if (isIdEmpty(id)) {
-            Log.print("id can not be null");
+    public void cancel(String token) {
+        if (isIdEmpty(token)) {
+            Log.print("token can not be null");
             return;
         }
-        mId = id;
+        mToken = token;
         findDownloadHistory();
         if (mDownloadId > 0) {
-            Log.print("remove id: " + mDownloadId);
             resetDownloadValues();
             downloadManager.remove(mDownloadId);
-            Utils.deleteDownload(mContext, id);
+            if (!mAllDownloadKept) {
+                Log.i("Removed token: " + mDownloadId);
+                Utils.deleteDownload(mContext, token);
+            }
         }
     }
 
@@ -279,8 +282,8 @@ public class Downloader {
         mTotalBytes = -1;
     }
 
-    public boolean deleteFile(String id, ActionListener listener) {
-        String fileUri = getDownloadedFilePath(id);
+    public boolean deleteFile(String token, ActionListener listener) {
+        String fileUri = getDownloadedFilePath(token);
         if (fileUri != null) {
             String filePath = Uri.parse(fileUri).getPath();
             if (filePath != null) {
@@ -288,7 +291,7 @@ public class Downloader {
                 if (downloadedFile.exists()) {
                     boolean deleted = downloadedFile.delete();
                     if (deleted) {
-                        cancel(id);
+                        cancel(token);
                         if (listener != null)
                             listener.onSuccess();
                         return true;
@@ -309,23 +312,23 @@ public class Downloader {
         return false;
     }
 
-    public DownloadStatus getStatus(String id) {
-        if (isIdEmpty(id)) {
-            Log.print("id can not be null");
+    public DownloadStatus getStatus(String token) {
+        if (isIdEmpty(token)) {
+            Log.print("token can not be null");
             return DownloadStatus.NONE;
         }
-        mId = id;
+        mToken = token;
         findDownloadHistory();
         getDownloadStatusWithReason();
         return mDownloadStatus;
     }
 
-    public String getDownloadedFilePath(String id) {
-        if (isIdEmpty(id)) {
-            Log.print("id can not be null");
+    public String getDownloadedFilePath(String token) {
+        if (isIdEmpty(token)) {
+            Log.print("token can not be null");
             return null;
         }
-        mId = id;
+        mToken = token;
         findDownloadHistory();
         getDownloadStatusWithReason();
         return mLocalUri;
@@ -376,13 +379,13 @@ public class Downloader {
 
                     int index = Utils.getThreadListIndex(Thread.currentThread());
                     if (index >= 0) {
-                        Utils.removeFromThreadList(mId);
+                        Utils.removeFromThreadList(mToken);
                     }
 
                 }
             });
-            Utils.removeFromThreadList(mId);
-            Utils.addToThreadList(mId, thread);
+            Utils.removeFromThreadList(mToken);
+            Utils.addToThreadList(mToken, thread);
             thread.start();
         }
     }
@@ -452,7 +455,7 @@ public class Downloader {
                     mDownloadStatus = DownloadStatus.SUCCESSFUL;
                     if (!Utils.isFileExist(mLocalUri)) {
                         mDownloadStatus = DownloadStatus.CANCELED;
-                        cancel(mId);
+                        cancel(mToken);
                     }
                     break;
                 default:
@@ -471,13 +474,13 @@ public class Downloader {
 
     private boolean findDownloadHistory() {
         boolean existed = false;
-        if (!isIdEmpty(mId)) {
+        if (!isIdEmpty(mToken)) {
             String query;
             SQLiteDatabase db = Utils.openDatabase(mContext);
             query = "SELECT * FROM "
                     + Constants.DOWNLOAD_DB_TABLE
                     + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
-                    + mId + "';";
+                    + mToken + "';";
 
             Cursor cur = null;
             try {
@@ -485,7 +488,7 @@ public class Downloader {
                 if (cur != null && cur.getCount() > 0) {
                     cur.moveToFirst();
                     existed = true;
-                    mId = Utils.getColumnString(cur, Strings.DOWNLOAD_PLUS_ID);
+                    mToken = Utils.getColumnString(cur, Strings.DOWNLOAD_PLUS_ID);
                     mUrl = Utils.getColumnString(cur, Strings.URL);
                     mDownloadId = Utils.getColumnLong(cur, Strings.DOWNLOAD_ID);
                 }
@@ -502,7 +505,7 @@ public class Downloader {
         return existed;
     }
 
-    public static String getId(Context context, long downloadId) {
+    public static String getToken(Context context, long downloadId) {
         String query;
         SQLiteDatabase db = Utils.openDatabase(context);
         query = "SELECT * FROM "
@@ -530,13 +533,13 @@ public class Downloader {
     }
 
 
-    public static long getDownloadId(Context context, String id) {
+    public static long getDownloadId(Context context, String token) {
         String query;
         SQLiteDatabase db = Utils.openDatabase(context);
         query = "SELECT * FROM "
                 + Constants.DOWNLOAD_DB_TABLE
                 + " WHERE " + Strings.DOWNLOAD_PLUS_ID + " = '"
-                + id + "';";
+                + token + "';";
         long downloadId = -1;
         Cursor cur = null;
         try {
@@ -569,7 +572,7 @@ public class Downloader {
             do {
                 DownloadItem downloadItem = fetchDownloadItem(context, cursor);
                 Log.printItems(downloadItem);
-                if (downloadItem.getId() == null)
+                if (downloadItem.getToken() == null)
                     downloadManager.remove(downloadItem.getDownloadId());
                 else
                     downloadList.add(downloadItem);
@@ -581,12 +584,12 @@ public class Downloader {
         return downloadList;
     }
 
-    public static DownloadItem getDownloadItem(Context context, String id) {
-        if (context == null || Utils.isIdEmpty(id)) {
+    public static DownloadItem getDownloadItem(Context context, String token) {
+        if (context == null || Utils.isIdEmpty(token)) {
             return null;
         }
         DownloadItem downloadItem = null;
-        long downloadId = Downloader.getDownloadId(context, id);
+        long downloadId = Downloader.getDownloadId(context, token);
         if (downloadId < 0)
             return null;
         DownloadManager.Query q = new DownloadManager.Query();
@@ -631,7 +634,7 @@ public class Downloader {
                 , DownloadManager.COLUMN_MEDIA_TYPE));
         downloadItem.setTitle(Utils.getColumnString(cursor
                 , DownloadManager.COLUMN_TITLE));
-        downloadItem.setId(Downloader.getId(context, downloadItem.getDownloadId()));
+        downloadItem.setToken(Downloader.getToken(context, downloadItem.getDownloadId()));
         int totalBytes = downloadItem.getTotalBytes();
         int downloadedBytes = downloadItem.getDownloadedBytes();
         int percent = 0;
@@ -677,4 +680,8 @@ public class Downloader {
         }
     }
 
+    public Downloader setKeptAllDownload(boolean allDownloadKept) {
+        mAllDownloadKept = allDownloadKept;
+        return this;
+    }
 }

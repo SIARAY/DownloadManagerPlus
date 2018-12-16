@@ -30,15 +30,30 @@ public class YourNotificationBroadcastReceiver extends NotificationBroadcastRece
         openCustomActivity(context);
     }
 
+    @Override
+    public void onFailed(Context context, Intent intent, long downloadId) {
+        super.onFailed(context, intent, downloadId);
+        //You cant get download item here because android download manager removed it data.
+        Toast.makeText(context, "Download Notification Clicked.", Toast.LENGTH_SHORT).show();
+        Log.i("Download failed ,id: " + downloadId);
+        if(downloadId>0){
+            //for getting token by id here, you must setKeptAllDownload(true)
+            String token=Downloader.getToken(context,downloadId);
+            Log.i("Download failed ,token : " + token);
+            //Do not use the following method because it returns the null value.
+            //DownloadItem downloadItem=Downloader.getDownloadItem(context,token);
+        }
+    }
+
     private void printDownloadedFileId(Context context, Intent intent) {
         long downloadId = intent.getLongExtra(
                 DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-        String id = Downloader.getId(context, downloadId);
+        String id = Downloader.getToken(context, downloadId);
         DownloadItem downloadItem = Downloader.getDownloadItem(context, id);
         if (downloadItem != null && downloadItem.getPercent() == 100) {
             Log.i("Download Completed. Download id: " + downloadId);
             Log.i("Download plus id: " + id);
-            Log.i("Download id: " + Downloader.getDownloadId(context, Downloader.getId(context, downloadId)));
+            Log.i("Download id: " + Downloader.getDownloadId(context, Downloader.getToken(context, downloadId)));
             Toast.makeText(context, "Download Completed.", Toast.LENGTH_SHORT).show();
         } else {
             Log.i("Download Failed. Download id: " + downloadId);
@@ -63,8 +78,8 @@ public class YourNotificationBroadcastReceiver extends NotificationBroadcastRece
                 DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS);
         for (long id : downloadId) {
             Log.i("Download id: " + id);
-            Log.i("Download plus id: " + Downloader.getId(context, id));
-            Log.i("Download id: " + Downloader.getDownloadId(context, Downloader.getId(context, id)));
+            Log.i("Download plus id: " + Downloader.getToken(context, id));
+            Log.i("Download id: " + Downloader.getDownloadId(context, Downloader.getToken(context, id)));
         }
     }
 

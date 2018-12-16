@@ -20,7 +20,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver implements 
         String action = intent.getAction();
         if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
             long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
-            String id = Downloader.getId(context, downloadId);
+            String id = Downloader.getToken(context, downloadId);
             DownloadItem downloadItem = Downloader.getDownloadItem(context, id);
             if (downloadItem != null && downloadItem.getPercent() == 100) {
                 this.onCompleted(context, intent, downloadId);

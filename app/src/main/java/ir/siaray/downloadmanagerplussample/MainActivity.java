@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Downloader request = Downloader.getInstance(getApplicationContext())
                 .setListener(downloadListener)
                 .setUrl(url)
-                .setId(url)
+                .setToken(url)
                 .setAllowedOverRoaming(true)
                 .setVisibleInDownloadsUi(true)
                 .setDescription(url)
