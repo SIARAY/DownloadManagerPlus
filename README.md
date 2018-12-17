@@ -30,7 +30,7 @@ Using faster and easier than Android Download Manager
      .setDescription(description)
      .setNotificationVisibility(visibility)
      .setAllowedNetworkTypes(networkTypes)
-     .setKeptAllDownload(true);
+     .setKeptAllDownload(allDownloadKept);
      
     downloader.start();
 
