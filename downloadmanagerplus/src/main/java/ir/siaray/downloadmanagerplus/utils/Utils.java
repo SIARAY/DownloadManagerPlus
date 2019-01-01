@@ -28,7 +28,16 @@ public class Utils {
     }*/
 
     public static String getFileName(String url) {
-        return url.substring(url.lastIndexOf("/") + 1, url.length());
+        if (TextUtils.isEmpty(url))
+            return null;
+
+        if (!url.contains("/"))
+            return url;
+
+        int lastForwardSlashIndex = url.lastIndexOf("/");
+        if (lastForwardSlashIndex == url.length())
+            return null;
+        return url.substring(lastForwardSlashIndex + 1,url.length());
     }
 
     public static void openFile(Context context, String path) {

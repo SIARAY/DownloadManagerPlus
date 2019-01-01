@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onRunning(int percent, int totalBytes, int downloadedBytes) {
+            public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed) {
                 if (percent > lastPercent)
                     Log.i("Clipboard download onRunning : " + percent);
                 lastPercent = percent;

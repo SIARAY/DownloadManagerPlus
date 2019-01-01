@@ -8,13 +8,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="1.5dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="1.5dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1.5dp"
         android:background="@drawable/item_background_shape">
 
         <RelativeLayout
@@ -53,24 +53,41 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_toLeftOf="@+id/btn_delete"
             android:layout_toRightOf="@+id/btn_action"
             android:gravity="left"
             android:maxLines="2"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:textColor="#000"
             android:textSize="13sp" />
 
         <TextView
             android:id="@+id/tv_size"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_name"
             android:layout_marginTop="0dp"
-            android:layout_toLeftOf="@+id/btn_delete"
+            android:layout_toLeftOf="@+id/tv_speed"
             android:layout_toRightOf="@+id/btn_action"
             android:gravity="left"
+            android:maxLines="1"
+            android:paddingLeft="0dp"
+            android:paddingRight="10dp"
+            android:textColor="#888"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_name"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/btn_delete"
+            android:gravity="right"
             android:maxLines="1"
             android:paddingLeft="0dp"
             android:paddingRight="10dp"
@@ -81,8 +98,8 @@
             android:id="@+id/btn_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="3dp"
-            android:layout_alignParentRight="true">
+            android:layout_alignParentRight="true"
+            android:layout_margin="3dp">
 
             <ImageView
                 android:id="@+id/iv_delete"
@@ -98,18 +115,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="12dp"
             android:layout_marginRight="15dp"
-            android:layout_toRightOf="@+id/btn_action">
+            android:layout_marginBottom="12dp"
+            android:layout_toRightOf="@+id/btn_action"
+            android:gravity="center_vertical">
 
             <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
                 android:id="@+id/progressbar"
                 android:layout_width="match_parent"
-                android:layout_toLeftOf="@+id/tv_percent"
                 android:layout_height="4dp"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/tv_percent"
                 app:rcBackgroundColor="#CCCCCC"
                 app:rcBackgroundPadding="0dp"
                 app:rcMax="100"
@@ -124,9 +141,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:maxLines="1"
-                android:gravity="center"
                 android:layout_marginBottom="2dp"
+                android:gravity="center"
+                android:maxLines="1"
                 android:text="0%"
                 android:textColor="@color/colorAccent"
                 android:textSize="12sp" />

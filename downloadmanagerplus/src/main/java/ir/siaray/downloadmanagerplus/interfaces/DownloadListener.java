@@ -18,6 +18,6 @@ public interface DownloadListener {
 
     void onCancel(int totalBytes, int downloadedBytes);
 
-    void onRunning(int percent, int totalBytes, int downloadedBytes);
+    void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed);
 
 }

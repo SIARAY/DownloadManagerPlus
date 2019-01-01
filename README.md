@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'ir.siaray:downloadmanagerplus:1.2.8'
+        compile 'ir.siaray:downloadmanagerplus:1.2.9'
     }
 
 ## Usage
@@ -30,7 +30,7 @@ Using faster and easier than Android Download Manager
      .setDescription(description)
      .setNotificationVisibility(visibility)
      .setAllowedNetworkTypes(networkTypes)
-     .setKeptAllDownload(allDownloadKept);
+     .setKeptAllDownload(allDownloadKept); 
      
     downloader.start();
 

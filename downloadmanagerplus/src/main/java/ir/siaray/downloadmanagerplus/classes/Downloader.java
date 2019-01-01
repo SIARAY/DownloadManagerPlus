@@ -63,6 +63,9 @@ public class Downloader {
     private boolean mMeteredAllowed = true;
     private static DownloadManager downloadManager;
     private boolean mAllDownloadKept = false;
+    private long mStartMeasureDownloadSpeedTime = 0;
+    private int mLastDownloadedBytes = 0;
+    private float mDownloadSpeed;
 
     public static Downloader getInstance(Context mContext) {
         return (new Downloader(mContext));
@@ -270,7 +273,6 @@ public class Downloader {
             resetDownloadValues();
             downloadManager.remove(mDownloadId);
             if (!mAllDownloadKept) {
-                Log.i("Removed token: " + mDownloadId);
                 Utils.deleteDownload(mContext, token);
             }
         }
@@ -343,6 +345,7 @@ public class Downloader {
                 @Override
                 public void run() {
                     final boolean[] continuous = {true};
+                    mStartMeasureDownloadSpeedTime = System.currentTimeMillis();
                     do {
                         if (mContext != null) {
                             getDownloadStatusWithReason();
@@ -409,8 +412,23 @@ public class Downloader {
                 mListener.onCancel(mTotalBytes, mDownloadedBytes);
                 break;
             default://Running
-                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes);
+                measureDownloadSpeed();
+                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes, mDownloadSpeed);
                 break;
+        }
+    }
+
+    private void measureDownloadSpeed() {
+        int currentDownloadedBytes = mDownloadedBytes - mLastDownloadedBytes;
+        long endMeasureDownloadSpeedTime = System.currentTimeMillis();
+        if (endMeasureDownloadSpeedTime > mStartMeasureDownloadSpeedTime) {
+            if (currentDownloadedBytes > 0) {
+                float downloadSpeed = (currentDownloadedBytes / 1024f)
+                        / (((endMeasureDownloadSpeedTime - mStartMeasureDownloadSpeedTime) / 1000f));
+                mStartMeasureDownloadSpeedTime = endMeasureDownloadSpeedTime;
+                mLastDownloadedBytes = mDownloadedBytes;
+                mDownloadSpeed =downloadSpeed;
+            }
         }
     }
 
