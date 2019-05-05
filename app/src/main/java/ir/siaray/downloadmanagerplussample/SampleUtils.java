@@ -19,17 +19,17 @@ public class SampleUtils {
         FileItem item = new FileItem();
 
         if (number == 1) {
-            item.setToken("id1245");
             String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
+            item.setToken("id1245");
             item.setUri(link);
         } else if (number == 2) {
-            item.setToken("id1249");
             //String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
             String link = "https://hw7.cdn.asset.aparat.com/aparat-video/8752c8e2a411ce9e486f37983f21017411515047-360p__95568.mp4";
+            item.setToken("id1249");
             item.setUri(link);
         } else {
-            item.setToken("id1280");
             String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
+            item.setToken("id1280");
             item.setUri(link);
         }
         return item;

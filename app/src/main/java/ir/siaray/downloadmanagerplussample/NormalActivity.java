@@ -221,6 +221,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             DownloadStatus lastStatus = DownloadStatus.NONE;
             long startTime = 0;
             int lastDownloadedBytes = 0;
+            int lastPercent = 0;
 
             @Override
             public void onComplete(int totalBytes) {
@@ -294,7 +295,10 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
 
             @Override
             public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed) {
-                //Log.i("percent: "+percent);
+                if(percent>lastPercent) {
+                    Log.i("onRunning percent: " + percent);
+                    lastPercent=percent;
+                }
                 ivAction.setImageResource(R.mipmap.ic_cancel);
                 downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;

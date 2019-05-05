@@ -101,6 +101,9 @@ public class Downloader {
 
     public Downloader setUrl(String url) {
         mUrl = url;
+        if (isIdEmpty(mToken)) {
+            mToken = mUrl;
+        }
         return this;
     }
 
@@ -192,10 +195,10 @@ public class Downloader {
             return true;
         }
 
-        if (isIdEmpty(mToken)) {
+        /*if (isIdEmpty(mToken)) {
             Log.print("Token can not be null");
             mToken = mUrl;
-        }
+        }*/
 
         if (!isValidDirectory(mDestinationDir)) {
             Log.print("Directory is not valid, downloaded file will be save in default directory.");
@@ -337,6 +340,7 @@ public class Downloader {
     }
 
     public void showProgress() {
+
         if (mListener == null)
             return;
         if (findDownloadHistory()) {
@@ -350,6 +354,8 @@ public class Downloader {
                         if (mContext != null) {
                             getDownloadStatusWithReason();
                             if (mContext instanceof Activity) {
+                                if(((Activity)mContext).isFinishing())
+                                    break;
                                 ((Activity) mContext).runOnUiThread(new Runnable() {
 
                                     @Override
@@ -394,6 +400,7 @@ public class Downloader {
     }
 
     private void returnDownloadResponse(boolean[] continuous) {
+
         switch (mDownloadStatus) {
             case SUCCESSFUL:
                 mListener.onComplete(mTotalBytes);
