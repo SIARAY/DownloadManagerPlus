@@ -19,6 +19,7 @@ public class YourNotificationBroadcastReceiver extends NotificationBroadcastRece
     @Override
     public void onCompleted(Context context, Intent intent, long downloadId) {
         super.onCompleted(context, intent, downloadId);
+       Log.i("Complete downloaddddd id: "+downloadId);
         printDownloadedFileId(context, intent);
     }
 
@@ -54,6 +55,8 @@ public class YourNotificationBroadcastReceiver extends NotificationBroadcastRece
             Log.i("Download Completed. Download id: " + downloadId);
             Log.i("Download plus id: " + id);
             Log.i("Download id: " + Downloader.getDownloadId(context, Downloader.getToken(context, downloadId)));
+            Log.i("Download uri: " +downloadItem.getLocalUri());
+            Log.i("Download path: " +downloadItem.getFilePath());
             Toast.makeText(context, "Download Completed.", Toast.LENGTH_SHORT).show();
         } else {
             Log.i("Download Failed. Download id: " + downloadId);
@@ -64,6 +67,7 @@ public class YourNotificationBroadcastReceiver extends NotificationBroadcastRece
     private void openCustomActivity(Context context) {
         Intent dm = new Intent(context, NormalActivity.class);
         dm.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        dm.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(dm);
     }
 

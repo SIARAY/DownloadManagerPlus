@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="130dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="15dp"
-            android:background="@drawable/download_button_background_shape">
+            android:background="@drawable/download_button_background_shape_gray">
 
             <ImageView
                 android:id="@+id/iv_image"
@@ -96,8 +96,8 @@
 
         <RelativeLayout
             android:id="@+id/btn_delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_alignParentRight="true"
             android:layout_margin="3dp">
 
@@ -106,8 +106,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:padding="9dp"
-                android:src="@mipmap/ic_delete" />
+                android:padding="10dp"
+                android:src="@mipmap/ic_more_menu" />
 
         </RelativeLayout>
 

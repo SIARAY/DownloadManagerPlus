@@ -8,10 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
 import ir.siaray.downloadmanagerplus.enums.Errors;
+import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.model.DownloadItem;
@@ -28,7 +30,11 @@ import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Strings;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
+import static ir.siaray.downloadmanagerplus.utils.Strings.DOWNLOAD_DEFAULT_DIRECTORY;
+import static ir.siaray.downloadmanagerplus.utils.Utils.createDirectory;
+import static ir.siaray.downloadmanagerplus.utils.Utils.getAppTargetSdkVersion;
 import static ir.siaray.downloadmanagerplus.utils.Utils.isIdEmpty;
+import static ir.siaray.downloadmanagerplus.utils.Utils.isValidDefaultDirectory;
 import static ir.siaray.downloadmanagerplus.utils.Utils.isValidDirectory;
 
 
@@ -123,15 +129,41 @@ public class Downloader {
         return this;
     }
 
-    public Downloader setDestinationDir(String destinationDir, String fileName) {
+    /**
+     * @param destinationDir
+     * @deprecated Custom directory only work on targetSdkVersion 28 and lower<br/>
+     * If your app targetSdkVersion is 29 and higher, downloads will be saved
+     * in root/Download directory.
+     */
+    @Deprecated()
+    public Downloader setCustomDestinationDir(String destinationDir, String fileName) {
+        if (getAppTargetSdkVersion(mContext) < Build.VERSION_CODES.Q) {
+            mDestinationDir = destinationDir;
+            mFileName = fileName;
+        } else {
+            setDestinationDir(Storage.DIRECTORY_DOWNLOADS, fileName);
+        }
+        return this;
+    }
+
+    public Downloader setDestinationDir(@Storage.DownloadDirectory String destinationDir, String fileName) {
         mDestinationDir = destinationDir;
         mFileName = fileName;
         return this;
     }
 
     private String getCorrectionDownloadDir() {
-        String storageDir = Environment.getExternalStorageDirectory().getPath();
-        return mDestinationDir.replaceFirst(storageDir, "");
+        if (!TextUtils.isEmpty(mDestinationDir)) {
+            if (isValidDefaultDirectory(mDestinationDir)) {
+                return mDestinationDir;
+            }
+            if (getAppTargetSdkVersion(mContext) < Build.VERSION_CODES.Q) {
+                String storageDir = Environment.getExternalStorageDirectory().getPath();
+                return mDestinationDir.replaceFirst(storageDir, "");
+            }
+        }
+        mDestinationDir = DOWNLOAD_DEFAULT_DIRECTORY;
+        return DOWNLOAD_DEFAULT_DIRECTORY;
     }
 
 
@@ -162,7 +194,11 @@ public class Downloader {
     }
 
     private boolean createDownloadDir() {
-        return mDestinationDir != null && (new File(mDestinationDir).mkdirs());
+        if (isValidDefaultDirectory(mDestinationDir)) {
+            Log.i("Default directory no need to create");
+            return true;
+        }
+        return createDirectory(mDestinationDir);
     }
 
     public void start() {
@@ -200,11 +236,13 @@ public class Downloader {
             mToken = mUrl;
         }*/
 
-        if (!isValidDirectory(mDestinationDir)) {
-            Log.print("Directory is not valid, downloaded file will be save in default directory.");
-            mDestinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-            createDownloadDir();
-            if (!isValidDirectory(mDestinationDir)) {
+        if (!isValidDirectory(mContext, mDestinationDir)) {
+            Log.print("DownloadDirectory is not valid, downloaded file will be save in default directory.");
+            //mDestinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+            mDestinationDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath();
+            Log.i("$$$ path: " + mDestinationDir);
+            //createDownloadDir();
+            if (!isValidDirectory(mContext, mDestinationDir)) {
                 mListener.onFail(mPercent, DownloadReason.DESTINATION_DIRECTORY_NOT_FOUND, mTotalBytes, mDownloadedBytes);
                 return true;
             }
@@ -285,6 +323,7 @@ public class Downloader {
         mPercent = 0;
         mDownloadedBytes = 0;
         mTotalBytes = -1;
+        mDownloadStatus = DownloadStatus.NONE;
     }
 
     public boolean deleteFile(String token, ActionListener listener) {
@@ -354,7 +393,7 @@ public class Downloader {
                         if (mContext != null) {
                             getDownloadStatusWithReason();
                             if (mContext instanceof Activity) {
-                                if(((Activity)mContext).isFinishing())
+                                if (((Activity) mContext).isFinishing())
                                     break;
                                 ((Activity) mContext).runOnUiThread(new Runnable() {
 
@@ -434,7 +473,7 @@ public class Downloader {
                         / (((endMeasureDownloadSpeedTime - mStartMeasureDownloadSpeedTime) / 1000f));
                 mStartMeasureDownloadSpeedTime = endMeasureDownloadSpeedTime;
                 mLastDownloadedBytes = mDownloadedBytes;
-                mDownloadSpeed =downloadSpeed;
+                mDownloadSpeed = downloadSpeed;
             }
         }
     }

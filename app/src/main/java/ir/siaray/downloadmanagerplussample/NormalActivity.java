@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.pnikosis.materialishprogress.ProgressWheel;
@@ -28,11 +30,14 @@ import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
 import static ir.siaray.downloadmanagerplussample.MainActivity.DOWNLOAD_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.setDownloadBackgroundColor;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.showInfoDialog;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.showPopUpMenu;
 
 public class NormalActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
 
-    private int notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+    public static int notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +127,8 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 , tvSize
                 , tvSpeed
                 , tvPercent);
-        item.setListener(getDownloadListener(ivAction
+        item.setListener(getDownloadListener(btnAction
+                , ivAction
                 , downloadProgressBar
                 , progressWheel
                 , tvSize
@@ -144,16 +150,14 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Downloader downloader = Downloader.getInstance(NormalActivity.this)
-                        .setUrl(item.getUri())
-                        .setListener(item.getListener());
-
-                downloader.deleteFile(item.getToken(), deleteListener);
+                showPopUpMenu(NormalActivity.this, view, item, deleteListener);
             }
         });
     }
 
     private void clickOnActionButton(FileItem item) {
+        if (!SampleUtils.isStoragePermissionGranted(this))
+            return;
         final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
         if (downloader.getStatus(item.getToken()) == DownloadStatus.RUNNING
                 || downloader.getStatus(item.getToken()) == DownloadStatus.PAUSED
@@ -161,8 +165,9 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             downloader.cancel(item.getToken());
         else if (downloader.getStatus(item.getToken()) == DownloadStatus.SUCCESSFUL) {
             Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getToken()));
-        } else
+        } else {
             downloader.start();
+        }
     }
 
     private Downloader getDownloader(FileItem item, DownloadListener listener) {
@@ -177,8 +182,8 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 .setScanningByMediaScanner(true)
                 .setNotificationVisibility(notificationVisibility)
                 .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
-                .setDestinationDir(DOWNLOAD_DIRECTORY
-                        , Utils.getFileName(item.getUri()))
+                //.setCustomDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))//TargetApi 28 and lower
+                .setDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))
                 .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             request.setAllowedOverMetered(true); //Api 16 and higher
@@ -206,12 +211,11 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void onFailure(Errors error) {
                 Toast.makeText(NormalActivity.this, "" + error, Toast.LENGTH_SHORT).show();
-
             }
         };
     }
 
-    private DownloadListener getDownloadListener(final ImageView ivAction
+    private DownloadListener getDownloadListener(final View btnAction, final ImageView ivAction
             , final RoundCornerProgressBar downloadProgressBar
             , final ProgressWheel progressWheel
             , final TextView tvSize
@@ -227,6 +231,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
             public void onComplete(int totalBytes) {
                 Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
+                setDownloadBackgroundColor(btnAction, DownloadStatus.SUCCESSFUL);
                 downloadProgressBar.setProgress(100);
                 lastStatus = DownloadStatus.SUCCESSFUL;
                 progressWheel.setVisibility(View.GONE);
@@ -247,6 +252,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                     tvPercent.setText(percent + "%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Paused");
+                    setDownloadBackgroundColor(btnAction, DownloadStatus.PAUSED);
                 }
                 lastStatus = DownloadStatus.PAUSED;
             }
@@ -261,6 +267,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                     tvPercent.setText(percent + "%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Pending");
+                    setDownloadBackgroundColor(btnAction, DownloadStatus.PENDING);
                 }
                 lastStatus = DownloadStatus.PENDING;
             }
@@ -278,6 +285,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 tvPercent.setText(percent + "%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Failed");
+                setDownloadBackgroundColor(btnAction, DownloadStatus.FAILED);
 
             }
 
@@ -291,18 +299,22 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 tvPercent.setText("0%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Canceled");
+                setDownloadBackgroundColor(btnAction, DownloadStatus.CANCELED);
             }
 
             @Override
             public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed) {
-                if(percent>lastPercent) {
+                if (percent > lastPercent) {
                     Log.i("onRunning percent: " + percent);
-                    lastPercent=percent;
+                    lastPercent = percent;
                 }
-                ivAction.setImageResource(R.mipmap.ic_cancel);
+                if (lastStatus != DownloadStatus.RUNNING) {
+                    ivAction.setImageResource(R.mipmap.ic_cancel);
+                    setDownloadBackgroundColor(btnAction, DownloadStatus.RUNNING);
+                    progressWheel.setVisibility(View.GONE);
+                }
                 downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;
-                progressWheel.setVisibility(View.GONE);
                 tvPercent.setText(percent + "%");
                 if (totalBytes < 0 || downloadedBytes < 0)
                     tvSize.setText("loading...");

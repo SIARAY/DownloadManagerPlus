@@ -3,18 +3,22 @@ package ir.siaray.downloadmanagerplus.utils;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.v4.content.FileProvider;
-import android.support.v4.content.PermissionChecker;
+import android.os.Build;
 import android.text.TextUtils;
+
+import androidx.core.content.FileProvider;
+import androidx.core.content.PermissionChecker;
 
 import java.io.File;
 import java.text.DecimalFormat;
 
-import ir.siaray.downloadmanagerplus.BuildConfig;
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
+import ir.siaray.downloadmanagerplus.enums.Storage;
 
 /**
  * Created by SIARAY on 08/01/2017.
@@ -37,7 +41,7 @@ public class Utils {
         int lastForwardSlashIndex = url.lastIndexOf("/");
         if (lastForwardSlashIndex == url.length())
             return null;
-        return url.substring(lastForwardSlashIndex + 1,url.length());
+        return url.substring(lastForwardSlashIndex + 1, url.length());
     }
 
     public static void openFile(Context context, String path) {
@@ -271,15 +275,66 @@ public class Utils {
         return false;
     }
 
-    public static boolean isValidDirectory(String dir) {
+    public static boolean createDirectory(String dir) {
+        return dir != null && (new File(dir).mkdirs());
+    }
+
+    public static File getCreatedDirectory(String dir) {
+        if (dir != null) {
+            File file = new File(dir);
+            file.mkdirs();
+            return file;
+        }
+        return null;
+    }
+
+    public static boolean isValidDirectory(Context context, String dir) {
+        Log.i("creating path: " + dir);
         if (!TextUtils.isEmpty(dir)) {
-            File d = new File(dir);
-            d.mkdirs();
-            if (d.isDirectory())
+            if (isValidDefaultDirectory(dir)) {
+                Log.i("path is default directory");
                 return true;
+            }
+            if (getAppTargetSdkVersion(context) < Build.VERSION_CODES.Q) {
+                //File d = new File(dir);
+                //d.mkdirs();
+                //Log.i("creating path isSuccess: " + d.mkdirs());
+                File createdDir = getCreatedDirectory(dir);
+                return createdDir != null && createdDir.isDirectory();
+            }
         }
         return false;
     }
+
+    public static boolean isValidDefaultDirectory(String dir) {
+        return Storage.isValidDownloadDirectory(dir);
+    }
+
+    /*static boolean isDownloadEnumContent(final String dir) {
+        if (dir == null) {
+            return false;
+        }
+        for (DownloadDirectory c : DownloadDirectory.values()) {
+            Log.i("enum: " + c.getValue());
+            if (c.getValue().equals(dir)) {
+                return true;
+            }
+        }
+        return false;
+    }*/
+
+   /*static <E extends Enum<E>> boolean isValidEnum(final Class<E> enumClass, final String enumName) {
+        if (enumName == null) {
+            return false;
+        }
+        try {
+            Enum.valueOf(enumClass, enumName);
+            return true;
+        } catch (final IllegalArgumentException ex) {
+            Log.i("enum crashed... : "+enumName);
+            return false;
+        }
+    }*/
 
     public static int getPermissionsError(Context context) {
         //int writeExternalPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -298,4 +353,20 @@ public class Utils {
         return permissionError;
     }
 
+    public static int getAppTargetSdkVersion(Context context) {
+        int version = Build.VERSION_CODES.Q;
+        if (context != null) {
+            PackageManager pm = context.getPackageManager();
+            try {
+                if (pm != null) {
+                    ApplicationInfo applicationInfo = pm.getApplicationInfo(context.getPackageName(), 0);
+                    if (applicationInfo != null) {
+                        version = applicationInfo.targetSdkVersion;
+                    }
+                }
+            } catch (Exception e) {
+            }
+        }
+        return version;
+    }
 }

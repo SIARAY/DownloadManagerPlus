@@ -1,14 +1,33 @@
 package ir.siaray.downloadmanagerplussample;
 
+import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+
+import ir.siaray.downloadmanagerplus.classes.Downloader;
+import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.utils.Log;
+import ir.siaray.downloadmanagerplus.utils.Utils;
+
+import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 /**
  * Created by Siamak on 28/01/2017.
@@ -19,7 +38,8 @@ public class SampleUtils {
         FileItem item = new FileItem();
 
         if (number == 1) {
-            String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
+            //String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
+            String link = "https://mcdn.wallpapersafari.com/medium/94/21/3NbTzF.jpg";
             item.setToken("id1245");
             item.setUri(link);
         } else if (number == 2) {
@@ -28,16 +48,16 @@ public class SampleUtils {
             item.setToken("id1249");
             item.setUri(link);
         } else {
-            String link = "http://dl.smusic.ir/saal/95/6/Saman%20Jalili%20-%20Dastkhat.mp3";
+            String link = "https://cdnmrtehran.ir/media/mp3s_64/Mohammad_Reza_Shajarian/Albums/Tarighe_Eshgh/tasnif_jane_jahan.mp3";
             item.setToken("id1280");
             item.setUri(link);
         }
         return item;
     }
 
-    public static void getFileList(List<FileItem> list, int number) {
+    public static void getFileList(List<DownloadItem> list, int number) {
         for (int i = 0; i < number; i++) {
-            FileItem item = new FileItem();
+            DownloadItem item = new DownloadItem();
             item.setToken("" + i);
             String link = "";
             switch (i % 12) {
@@ -48,22 +68,22 @@ public class SampleUtils {
                     link = "http://dolly.roslin.ed.ac.uk/wp-content/uploads/2016/01/DollySideView.jpg";
                     break;
                 case 2:
-                    link = "http://www.dl.downloadsoftware.ir/music/bikalam/Carter%20Burwell%20-%20Fathers%20Gun.zip";
+                    link = "https://i.pinimg.com/originals/ce/69/4f/ce694f560636dffcf42ecf40d4f2f962.gif";
                     break;
                 case 3:
-                    link = "http://dl5.downloadha.com/hosein/NarmAfzaar/April%202017/Firefox.53.0.Final.Win.x64.en-US%20(www.Downloadha.com).zip";
+                    link = "https://dl2.soft98.ir/soft/m/Mozilla.Firefox.76.0.1.EN.x64.zip";
                     break;
                 case 4:
-                    link = "http://hdwallpaperbackgrounds.net/wp-content/uploads/2016/07/4k-wallpaper-11.jpg";
+                    link = "https://wallpapercave.com/wp/wp5211914.jpg";
                     break;
                 case 5:
                     link = "http://wallpaperpulse.com/img/2242184.jpg";
                     break;
                 case 6:
-                    link = "http://free4kwallpaper.com/wp-content/uploads/2016/01/Beautiful-Girl-in-Nature-4K-Wallpaper.jpg";
+                    link = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
                     break;
                 case 7:
-                    link = "https://s-media-cache-ak0.pinimg.com/originals/5a/7a/f6/5a7af672ea944a471b1420e411743461.jpg";
+                    link = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
                     break;
                 case 8:
                     link = "http://yesofcorsa.com/wp-content/uploads/2016/12/4k-Love-Wallpaper-HQ-1024x576.jpg";
@@ -72,15 +92,14 @@ public class SampleUtils {
                     link = "http://yesofcorsa.com/wp-content/uploads/2017/01/4K-Rain-Wallpaper-Download-1024x640.jpeg";
                     break;
                 case 10:
-                    link = "http://zonewallpaper.net/wp-content/uploads/2016/11/Best-4K-Nature-Wallpaper-2016.jpeg";
+                    link = "https://file-examples.com/wp-content/uploads/2017/10/file-example_PDF_500_kB.pdf";
                     break;
                 case 11:
-                    link = "http://desktopwalls.net/wp-content/uploads/2015/09/" +
-                            "Fortress%20Town%20Lake%20Bridge%204K%20Ultra%20HD%20Desktop%20Wallpaper.jpg";
+                    link = "https://file-examples.com/wp-content/uploads/2017/10/file_example_JPG_100kB.jpg";
                     break;
 
                 default:
-                    link = "http://dl.pop-music.ir/music/1395/Dey/Saman%20Jalili%20-%20Tars.mp3";
+                    link = "https://file-examples.com/wp-content/uploads/2017/02/zip_2MB.zip";
             }
             item.setUri(link);
             list.add(item);
@@ -135,5 +154,99 @@ public class SampleUtils {
         if (url == null || !url.contains("."))
             return null;
         return url.substring(url.lastIndexOf('.'), url.length());
+    }
+
+
+    public static boolean isStoragePermissionGranted(Activity activity) {
+        if (ActivityCompat.checkSelfPermission(activity
+                , WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{WRITE_EXTERNAL_STORAGE}, 1);
+            return false;
+        }
+        return true;
+    }
+
+
+    public static void showInfoDialog(final Activity activity, final DownloadItem downloadItem) {
+        if (downloadItem == null) {
+            Toast.makeText(activity, "Download details not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        AlertDialog dialog;
+        AlertDialog.Builder builder;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(activity, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(activity);
+        }
+        dialog = builder.setTitle("Details")
+                .setMessage(Log.printItems(downloadItem))
+                .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.openFile(activity, downloadItem.getLocalUri());
+
+                //else dialog stays open. Make sure you have an obvious way to close the dialog especially if you set cancellable to false.
+            }
+        });
+    }
+
+    public static void showPopUpMenu(final Activity activity,View view, final FileItem item, final ActionListener deleteListener){
+        PopupMenu overflowPopupMenu = new PopupMenu(activity, view);
+        overflowPopupMenu.getMenuInflater().inflate(R.menu.popup_overflow_options, overflowPopupMenu.getMenu());
+
+        overflowPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(android.view.MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.popUpDelete:
+                        deleteFile(activity, item, deleteListener);
+                        break;
+                    case R.id.popUpDetails:
+                        showInfoDialog( activity, Downloader.getDownloadItem(activity,item.getToken()));
+                        break;
+                }
+                return true;
+            }
+        });
+        overflowPopupMenu.show();
+    }
+
+
+    public static void deleteFile(Context context, FileItem item, ActionListener deleteListener) {
+        Downloader downloader = Downloader.getInstance(context)
+                .setUrl(item.getUri())
+                .setListener(item.getListener());
+
+        boolean deleted=downloader.deleteFile(item.getToken(), deleteListener);
+        ir.siaray.downloadmanagerplussample.Log.print("File deleted: "+deleted);
+    }
+
+    static void setDownloadBackgroundColor(View view, DownloadStatus status) {
+        if (status == DownloadStatus.SUCCESSFUL) {
+            view.setBackgroundResource(R.drawable.download_button_background_shape_green);
+        } else if (status == DownloadStatus.FAILED) {
+            view.setBackgroundResource(R.drawable.download_button_background_shape_red);
+        } else if (status == DownloadStatus.PENDING || status == DownloadStatus.PAUSED) {
+            view.setBackgroundResource(R.drawable.download_button_background_shape_yellow);
+        } else if (status == DownloadStatus.RUNNING){
+            view.setBackgroundResource(R.drawable.download_button_background_shape_blue);
+        }else {
+            view.setBackgroundResource(R.drawable.download_button_background_shape_gray);
+        }
     }
 }

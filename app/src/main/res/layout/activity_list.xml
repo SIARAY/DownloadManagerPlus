@@ -4,15 +4,24 @@
     android:id="@+id/activity_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:background="@color/appBackground"
-    tools:context="com.siaray.downloadmanagerplussample.ir.siaray.downloadmanagerplussample.ListActivity">
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="ir.siaray.downloadmanagerplussample.ListActivity">
 
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/rv_downloads"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="20dp"
+        android:text="There is no download\n Please start a download from Downloads page" />
 
-</android.support.v7.widget.RecyclerView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_downloads"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </RelativeLayout>

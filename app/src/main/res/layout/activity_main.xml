@@ -35,7 +35,7 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="#de0a65"
         android:gravity="center"
-        android:text="Get first download item"
+        android:text="Downloading list"
         android:textColor="#ffffff"
         android:textSize="17sp"
         android:visibility="visible" />

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DownloadManagerPlus</string>
+    <string name="popup_menu_delete">Delete</string>
+    <string name="popup_menu_details">Details</string>
 </resources>

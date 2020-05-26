@@ -18,7 +18,7 @@ public class DownloadItem {
     private long downloadId;
     private int downloadedBytes;
     private int totalBytes;
-    private DownloadStatus downloadStatus;
+    private DownloadStatus downloadStatus = DownloadStatus.NONE;
     private int reason;
     private String localUri;
     private String localFilePath;
@@ -130,8 +130,8 @@ public class DownloadItem {
     public void setLocalUri(String localUri) {
         localFilePath = getFilePathFromUri(localUri);
         this.localUri = localUri;
-        Log.i("### localFilePath: "+ localFilePath);
-        Log.i("### localUri: "+localUri);
+        Log.i("### localFilePath: " + localFilePath);
+        Log.i("### localUri: " + localUri);
     }
 
     private String getFilePathFromUri(String localUri) {

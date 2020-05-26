@@ -21,6 +21,10 @@ public class Log {
     }
 
     public static String printItems(Object obj) {
+        if(obj==null){
+            Log.i("Object is null");
+            return null;
+        }
         Log.i("*** " + obj.getClass().getSimpleName() + " Values ***");
         String result = "";
         for (Field field : obj.getClass().getDeclaredFields()) {
