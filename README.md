@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        compile 'ir.siaray:downloadmanagerplus:1.3.0'
+        implementation 'ir.siaray:downloadmanagerplus:1.4.0'
     }
 
 ## Usage
@@ -25,7 +25,7 @@ Using faster and easier than Android Download Manager
      .setAllowedOverRoaming(roamingAllowed)
      .setAllowedOverMetered(meteredAllowed) //Api 16 and higher
      .setVisibleInDownloadsUi(isVisible)
-     .setDestinationDir(path, fileName)
+     .setDestinationDir(directory, fileName)
      .setNotificationTitle(notificationTitle)
      .setDescription(description)
      .setNotificationVisibility(visibility)

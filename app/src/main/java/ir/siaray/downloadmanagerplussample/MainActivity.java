@@ -5,50 +5,68 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.webkit.URLUtil;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.util.List;
-
 import ir.siaray.downloadmanagerplus.BuildConfig;
-import ir.siaray.downloadmanagerplus.classes.Downloader;
-import ir.siaray.downloadmanagerplus.enums.DownloadReason;
-import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
 import ir.siaray.downloadmanagerplus.enums.Storage;
-import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
-import ir.siaray.downloadmanagerplus.model.DownloadItem;
-import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
-import static ir.siaray.downloadmanagerplussample.SampleUtils.getFileType;
+import static ir.siaray.downloadmanagerplus.enums.Storage.*;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.DOWNLOAD_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.STORAGE_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.downloadDirectoryArray;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.isSamsung;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String STORAGE_DIRECTORY = Environment.getExternalStorageDirectory().getPath();
-    public static final String DOWNLOAD_DIRECTORY = Storage.DIRECTORY_DOWNLOADS;//STORAGE_DIRECTORY + "/dmp";
-    private ClipboardManager.OnPrimaryClipChangedListener listener;
-    private ClipboardManager clipboardManager;
-    private int notificationVisibility = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
-    private DownloadListener downloadListener;
+    //private ClipboardManager.OnPrimaryClipChangedListener listener;
+    //private ClipboardManager clipboardManager;
+    //private DownloadListener downloadListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initUi();
-        initializeClipboardManager();
+        initDownloadDirectorySpinner();
+        initNotificationTypeSpinner();
+        //initializeClipboardManager();
     }
 
-    private void initializeClipboardManager() {
+    private void initNotificationTypeSpinner() {
+        Spinner dropdown = findViewById(R.id.sp_notification_type);
+        String[] items = new String[]{
+                "VISIBILITY_VISIBLE_NOTIFY_COMPLETED",
+                "VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION",
+                "VISIBILITY_VISIBLE",
+                "VISIBILITY_HIDDEN"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner, items);
+        dropdown.setAdapter(adapter);
+        dropdown.setOnItemSelectedListener(SampleUtils.getNotificationOnItemSelectListener());
+        dropdown.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    private void initDownloadDirectorySpinner() {
+        Spinner dropdown = findViewById(R.id.sp_download_directory);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner, downloadDirectoryArray);
+        dropdown.setAdapter(adapter);
+        dropdown.setSelection(4);
+
+        dropdown.setOnItemSelectedListener(SampleUtils.getDownloadOnItemSelectListener());
+        dropdown.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    /*private void initializeClipboardManager() {
         Log.i("initializeClipboardManager");
         initializeClipboardListener();
         clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -148,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         clipboardManager.removePrimaryClipChangedListener(listener);
-    }
+    }*/
 
     private void initUi() {
         TextView tvVersion = findViewById(R.id.tv_version);
@@ -205,29 +223,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         }
     }
-
-    public static boolean isSamsung() {
-        String manufacturer = Build.MANUFACTURER;
-        if (manufacturer != null) return manufacturer.contains("samsung");
-        return false;
-    }
-
-
-    //////////////////////////////////////////////////////////////////////////////
-    /*public void notifyThis(String title, String message) {
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this);
-        b.setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker("{your tiny message}")
-                .setContentTitle(title)
-                .setContentText(message)
-                .setContentInfo("INFO");
-
-        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(1, b.build());
-    }*/
-
 
 }

@@ -27,8 +27,8 @@ import ir.siaray.downloadmanagerplus.utils.Utils;
 
 import java.util.List;
 
-import static ir.siaray.downloadmanagerplussample.MainActivity.DOWNLOAD_DIRECTORY;
-import static ir.siaray.downloadmanagerplussample.NormalActivity.notificationVisibility;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.DOWNLOAD_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.NOTIFICATION_VISIBILITY;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.setDownloadBackgroundColor;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.showPopUpMenu;
 
@@ -296,7 +296,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))
                 .setScanningByMediaScanner(true)
-                .setNotificationVisibility(notificationVisibility)
+                .setNotificationVisibility(NOTIFICATION_VISIBILITY)
                 .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
                 //.setCustomDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))//TargetApi 28 and lower
                 .setDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))
@@ -363,7 +363,8 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                     holder.progressWheel.setVisibility(View.GONE);
                     holder.tvPercent.setText(item.getPercent() + "%");
                     holder.tvSize.setText("Deleted");
-               // }
+                    setDownloadBackgroundColor(holder.btnAction, DownloadStatus.CANCELED);
+                // }
             }
 
             @Override

@@ -1,13 +1,15 @@
 package ir.siaray.downloadmanagerplussample;
 
 import android.app.Activity;
-import android.content.ClipboardManager;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -21,34 +23,65 @@ import java.util.List;
 
 import ir.siaray.downloadmanagerplus.classes.Downloader;
 import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
+import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.model.DownloadItem;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
-import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_ALARMS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_AUDIOBOOKS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_DCIM;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_DOCUMENTS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_DOWNLOADS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_MOVIES;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_MUSIC;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_NOTIFICATIONS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_PICTURES;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_PODCASTS;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_RINGTONES;
+import static ir.siaray.downloadmanagerplus.enums.Storage.DIRECTORY_SCREENSHOTS;
 
 /**
  * Created by Siamak on 28/01/2017.
  */
 
 public class SampleUtils {
+
+    public static final String STORAGE_DIRECTORY = Environment.getExternalStorageDirectory().getPath();
+    public static String DOWNLOAD_DIRECTORY = Storage.DIRECTORY_DOWNLOADS;//STORAGE_DIRECTORY + "/dmp";
+    public static int NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+    static String[] downloadDirectoryArray = new String[]{
+            DIRECTORY_ALARMS
+            , DIRECTORY_AUDIOBOOKS
+            , DIRECTORY_DCIM
+            , DIRECTORY_DOCUMENTS
+            , DIRECTORY_DOWNLOADS
+            , DIRECTORY_MOVIES
+            , DIRECTORY_MUSIC
+            , DIRECTORY_NOTIFICATIONS
+            , DIRECTORY_PICTURES
+            , DIRECTORY_PODCASTS
+            , DIRECTORY_RINGTONES
+            , DIRECTORY_SCREENSHOTS
+    };
+
     public static FileItem getDownloadItem(int number) {
         FileItem item = new FileItem();
 
         if (number == 1) {
             //String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
-            String link = "https://mcdn.wallpapersafari.com/medium/94/21/3NbTzF.jpg";
+            String link = "https://file-examples.com/wp-content/uploads/2017/10/file_example_JPG_100kB.jpg";
             item.setToken("id1245");
             item.setUri(link);
         } else if (number == 2) {
             //String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
-            String link = "https://hw7.cdn.asset.aparat.com/aparat-video/8752c8e2a411ce9e486f37983f21017411515047-360p__95568.mp4";
+            String link = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
             item.setToken("id1249");
             item.setUri(link);
         } else {
-            String link = "https://cdnmrtehran.ir/media/mp3s_64/Mohammad_Reza_Shajarian/Albums/Tarighe_Eshgh/tasnif_jane_jahan.mp3";
+            String link = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
             item.setToken("id1280");
             item.setUri(link);
         }
@@ -205,7 +238,7 @@ public class SampleUtils {
         });
     }
 
-    public static void showPopUpMenu(final Activity activity,View view, final FileItem item, final ActionListener deleteListener){
+    public static void showPopUpMenu(final Activity activity, View view, final FileItem item, final ActionListener deleteListener) {
         PopupMenu overflowPopupMenu = new PopupMenu(activity, view);
         overflowPopupMenu.getMenuInflater().inflate(R.menu.popup_overflow_options, overflowPopupMenu.getMenu());
 
@@ -217,7 +250,7 @@ public class SampleUtils {
                         deleteFile(activity, item, deleteListener);
                         break;
                     case R.id.popUpDetails:
-                        showInfoDialog( activity, Downloader.getDownloadItem(activity,item.getToken()));
+                        showInfoDialog(activity, Downloader.getDownloadItem(activity, item.getToken()));
                         break;
                 }
                 return true;
@@ -226,14 +259,19 @@ public class SampleUtils {
         overflowPopupMenu.show();
     }
 
-
     public static void deleteFile(Context context, FileItem item, ActionListener deleteListener) {
         Downloader downloader = Downloader.getInstance(context)
                 .setUrl(item.getUri())
                 .setListener(item.getListener());
 
-        boolean deleted=downloader.deleteFile(item.getToken(), deleteListener);
-        ir.siaray.downloadmanagerplussample.Log.print("File deleted: "+deleted);
+        boolean deleted = downloader.deleteFile(item.getToken(), deleteListener);
+        ir.siaray.downloadmanagerplussample.Log.print("File deleted: " + deleted);
+    }
+
+    public static boolean isSamsung() {
+        String manufacturer = Build.MANUFACTURER;
+        if (manufacturer != null) return manufacturer.contains("samsung");
+        return false;
     }
 
     static void setDownloadBackgroundColor(View view, DownloadStatus status) {
@@ -243,10 +281,54 @@ public class SampleUtils {
             view.setBackgroundResource(R.drawable.download_button_background_shape_red);
         } else if (status == DownloadStatus.PENDING || status == DownloadStatus.PAUSED) {
             view.setBackgroundResource(R.drawable.download_button_background_shape_yellow);
-        } else if (status == DownloadStatus.RUNNING){
+        } else if (status == DownloadStatus.RUNNING) {
             view.setBackgroundResource(R.drawable.download_button_background_shape_blue);
-        }else {
+        } else {
             view.setBackgroundResource(R.drawable.download_button_background_shape_gray);
         }
+    }
+
+    static AdapterView.OnItemSelectedListener getNotificationOnItemSelectListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+
+                        break;
+                    case 1:
+                        NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
+                        break;
+
+                    case 2:
+                        NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_VISIBLE;
+                        break;
+
+                    case 3:
+                        NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_HIDDEN;
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                NOTIFICATION_VISIBILITY = DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+            }
+        };
+    }
+
+    static AdapterView.OnItemSelectedListener getDownloadOnItemSelectListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                DOWNLOAD_DIRECTORY = downloadDirectoryArray[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                DOWNLOAD_DIRECTORY = DIRECTORY_DOWNLOADS;
+            }
+        };
     }
 }

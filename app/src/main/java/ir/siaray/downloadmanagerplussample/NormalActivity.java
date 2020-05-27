@@ -29,62 +29,21 @@ import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
-import static ir.siaray.downloadmanagerplussample.MainActivity.DOWNLOAD_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.DOWNLOAD_DIRECTORY;
+import static ir.siaray.downloadmanagerplussample.SampleUtils.NOTIFICATION_VISIBILITY;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.setDownloadBackgroundColor;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.showInfoDialog;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.showPopUpMenu;
 
-public class NormalActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-
-    public static int notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
+public class NormalActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_normal);
-        initSpinner();
         inflateUi();
     }
 
-    private void initSpinner() {
-        Spinner dropdown = findViewById(R.id.sp_notification_type);
-        String[] items = new String[]{
-                "VISIBILITY_VISIBLE_NOTIFY_COMPLETED",
-                "VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION",
-                "VISIBILITY_VISIBLE",
-                "VISIBILITY_HIDDEN"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner, items);
-        dropdown.setAdapter(adapter);
-        dropdown.setOnItemSelectedListener(this);
-        dropdown.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        switch (position) {
-            case 0:
-                notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
-
-                break;
-            case 1:
-                notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION;
-                break;
-
-            case 2:
-                notificationVisibility = Request.VISIBILITY_VISIBLE;
-                break;
-
-            case 3:
-                notificationVisibility = Request.VISIBILITY_HIDDEN;
-                break;
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        notificationVisibility = Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
-    }
 
     private void inflateUi() {
         ViewGroup itemContainer = findViewById(R.id.item_container);
@@ -180,7 +139,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))
                 .setScanningByMediaScanner(true)
-                .setNotificationVisibility(notificationVisibility)
+                .setNotificationVisibility(NOTIFICATION_VISIBILITY)
                 .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
                 //.setCustomDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))//TargetApi 28 and lower
                 .setDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))
@@ -191,8 +150,9 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
         return request;
     }
 
-    private ActionListener getDeleteListener(final ImageView ivAction
-            , final ViewGroup btnDelete
+    private ActionListener getDeleteListener(
+            final ImageView ivAction
+            , final ViewGroup btnAction
             , final RoundCornerProgressBar downloadProgressBar
             , ProgressWheel progressWheel
             , final TextView tvSize
@@ -206,6 +166,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
                 tvSize.setText(" Deleted");
                 tvPercent.setText("0%");
                 Toast.makeText(NormalActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                setDownloadBackgroundColor(btnAction, DownloadStatus.CANCELED);
             }
 
             @Override
@@ -215,7 +176,8 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
         };
     }
 
-    private DownloadListener getDownloadListener(final View btnAction, final ImageView ivAction
+    private DownloadListener getDownloadListener(final View btnAction
+            , final ImageView ivAction
             , final RoundCornerProgressBar downloadProgressBar
             , final ProgressWheel progressWheel
             , final TextView tvSize
@@ -274,7 +236,7 @@ public class NormalActivity extends AppCompatActivity implements AdapterView.OnI
 
             @Override
             public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
-                Toast.makeText(NormalActivity.this, "Failed: " + reason, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(NormalActivity.this, "Failed: " + reason, Toast.LENGTH_SHORT).show();
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
                         + " reason:" + reason);
