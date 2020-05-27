@@ -16,7 +16,6 @@
         android:id="@+id/dir_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -50,7 +49,6 @@
         android:id="@+id/type_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -86,8 +84,6 @@
         android:id="@+id/button1"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:backgroundTint="#1cc65d"
         android:gravity="center"
         android:text="Downloads Page"
@@ -99,8 +95,6 @@
         style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:backgroundTint="#de0a65"
         android:gravity="center"
@@ -114,8 +108,6 @@
         style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:backgroundTint="#1b81ed"
         android:gravity="center"
