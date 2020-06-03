@@ -238,8 +238,7 @@ public class Downloader {
 
         if (!isValidDirectory(mContext, mDestinationDir)) {
             Log.print("DownloadDirectory is not valid, downloaded file will be save in default directory.");
-            //mDestinationDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
-            mDestinationDir = mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath();
+            mDestinationDir = Storage.DIRECTORY_DOWNLOADS;
             Log.i("$$$ path: " + mDestinationDir);
             //createDownloadDir();
             if (!isValidDirectory(mContext, mDestinationDir)) {

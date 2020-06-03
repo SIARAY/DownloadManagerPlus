@@ -21,6 +21,7 @@ import ir.siaray.downloadmanagerplus.classes.Downloader;
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
 import ir.siaray.downloadmanagerplus.enums.Errors;
+import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.utils.Utils;
@@ -152,7 +153,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                 .setUrl(item.getUri())
                 .setListener(holder.listener)
                 .setToken(item.getToken())
-                .setDestinationDir(Environment.DIRECTORY_DOWNLOADS
+                .setDestinationDir(Storage.DIRECTORY_DOWNLOADS
                         , Utils.getFileName(item.getUri()))
                 .setNotificationTitle(Utils.getFileName(item.getUri()))
                 .showProgress();
