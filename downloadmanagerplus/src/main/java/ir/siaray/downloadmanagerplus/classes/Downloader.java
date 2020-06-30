@@ -317,6 +317,31 @@ public class Downloader {
             }
         }
     }
+    public void pause(String title){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("control",1);
+    
+            try {
+               context.getContentResolver().update(Uri.parse("content://downloads/my_downloads"),
+                        contentValues,
+                        "title=?",
+                        new String[]{title});
+            }catch (Exception e){
+                Log.print("Download item not found");
+            }
+    }
+    public void resume(String title){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("control",0);
+            try {
+               context.getContentResolver().update(Uri.parse("content://downloads/my_downloads"),
+                        contentValues,
+                        "title=?",
+                        new String[]{title});
+            }catch (Exception e){
+                Log.print("Download item not found");
+            }
+    }
 
     private void resetDownloadValues() {
         mPercent = 0;
