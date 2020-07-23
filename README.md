@@ -11,7 +11,7 @@ Using faster and easier than Android Download Manager
 ##### Dependency
 
     dependencies {
-        implementation 'ir.siaray:downloadmanagerplus:1.4.0'
+        implementation 'ir.siaray:downloadmanagerplus:1.4.1'
     }
 
 ## Usage
@@ -41,6 +41,18 @@ Using faster and easier than Android Download Manager
 ##### To cancel a download.
 
     downloader.cancel(token);
+    
+##### To pause a download.
+
+    downloader.pause();
+    or
+    Downloader.pause(context, token);
+    
+##### To resume a download.
+
+    downloader.resume();
+    or
+    Downloader.resume(context, token);
 
 ##### Detect download status.
 

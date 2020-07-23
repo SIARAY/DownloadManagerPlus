@@ -234,10 +234,11 @@ public class NormalActivity extends AppCompatActivity {
                     downloadProgressBar.setProgress(percent);
                     loading.setVisibility(View.VISIBLE);
                     tvPercent.setText(percent + "%");
-                    tvSize.setText(Utils.readableFileSize(downloadedBytes)
-                            + "/" + Utils.readableFileSize(totalBytes) + " - Paused");
+
                     setDownloadBackgroundColor(btnAction, DownloadStatus.PAUSED);
                 }
+                tvSize.setText(Utils.readableFileSize(downloadedBytes)
+                        + "/" + Utils.readableFileSize(totalBytes) + " - Paused - "+reason);
                 lastStatus = DownloadStatus.PAUSED;
             }
 
