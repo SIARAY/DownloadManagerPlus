@@ -30,10 +30,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
+                android:tint="#ffffff"
                 android:padding="22dp"
                 android:src="@mipmap/ic_start" />
 
-            <com.pnikosis.materialishprogress.ProgressWheel
+            <!--<com.pnikosis.materialishprogress.ProgressWheel
                 android:id="@+id/progress_wheel"
                 android:layout_width="54dp"
                 android:layout_height="54dp"
@@ -43,7 +44,7 @@
                 app:matProg_barWidth="3dp"
                 app:matProg_fillRadius="true"
                 app:matProg_progressIndeterminate="true"
-                app:matProg_spinSpeed="0.5" />
+                app:matProg_spinSpeed="0.5" />-->
 
         </RelativeLayout>
 
@@ -131,10 +132,23 @@
                 app:rcBackgroundPadding="0dp"
                 app:rcMax="100"
                 app:rcProgress="0"
+                app:rcAnimationSpeedScale="3"
                 app:rcProgressColor="@color/colorAccent"
                 app:rcRadius="10dp"
                 app:rcSecondaryProgress="0"
                 app:rcSecondaryProgressColor="#dddddd" />
+
+            <com.akexorcist.roundcornerprogressbar.indeterminate.IndeterminateRoundCornerProgressBar
+                android:id="@+id/loading"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/tv_percent"
+                app:rcAnimationSpeedScale="3"
+                app:rcBackgroundColor="#CCCCCC"
+                android:visibility="gone"
+                app:rcProgressColor="@color/colorPaused" />
 
             <TextView
                 android:id="@+id/tv_percent"

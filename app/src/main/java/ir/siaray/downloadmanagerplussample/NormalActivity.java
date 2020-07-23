@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.akexorcist.roundcornerprogressbar.indeterminate.IndeterminateRoundCornerProgressBar;
 import com.pnikosis.materialishprogress.ProgressWheel;
 
 import ir.siaray.downloadmanagerplus.classes.Downloader;
@@ -74,22 +75,25 @@ public class NormalActivity extends AppCompatActivity {
         TextView tvSize = view.findViewById(R.id.tv_size);
         TextView tvSpeed = view.findViewById(R.id.tv_speed);
         TextView tvPercent = view.findViewById(R.id.tv_percent);
-        ProgressWheel progressWheel = view.findViewById(R.id.progress_wheel);
+        IndeterminateRoundCornerProgressBar loading = view.findViewById(R.id.loading);
         final RoundCornerProgressBar downloadProgressBar = view.findViewById(R.id.progressbar);
 
         tvName.setText(Utils.getFileName(item.getUri()));
 
-        final ActionListener deleteListener = getDeleteListener(ivAction
+        final ActionListener deleteListener = getDeleteListener(item
+                , ivAction
                 , btnAction
                 , downloadProgressBar
-                , progressWheel
+                , loading
                 , tvSize
                 , tvSpeed
                 , tvPercent);
-        item.setListener(getDownloadListener(btnAction
+        item.setListener(getDownloadListener(
+                item
+                , btnAction
                 , ivAction
                 , downloadProgressBar
-                , progressWheel
+                , loading
                 , tvSize
                 , tvSpeed
                 , tvPercent));
@@ -117,12 +121,24 @@ public class NormalActivity extends AppCompatActivity {
     private void clickOnActionButton(FileItem item) {
         if (!SampleUtils.isStoragePermissionGranted(this))
             return;
-        final Downloader downloader = getDownloader(item, item.getListener()/*listener*/);
+        final Downloader downloader = getDownloader(item, item.getListener());
         if (downloader.getStatus(item.getToken()) == DownloadStatus.RUNNING
                 || downloader.getStatus(item.getToken()) == DownloadStatus.PAUSED
-                || downloader.getStatus(item.getToken()) == DownloadStatus.PENDING)
-            downloader.cancel(item.getToken());
-        else if (downloader.getStatus(item.getToken()) == DownloadStatus.SUCCESSFUL) {
+                || downloader.getStatus(item.getToken()) == DownloadStatus.PENDING) {
+            if (downloader.getStatus(item.getToken()) == DownloadStatus.PENDING
+                    || downloader.getDownloadedBytes() <= 0) {
+                downloader.cancel(item.getToken());
+            } else if (downloader.getStatus(item.getToken()) == DownloadStatus.PAUSED) {
+                //int status = Downloader.resume(this, item.getToken());
+                downloader.resume();
+                Toast.makeText(this, "Resume clicked", Toast.LENGTH_SHORT).show();
+            } else {
+                //int status = Downloader.pause(this, item.getToken());
+                downloader.pause();
+                Toast.makeText(this, "Pause clicked", Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (downloader.getStatus(item.getToken()) == DownloadStatus.SUCCESSFUL) {
             Utils.openFile(NormalActivity.this, downloader.getDownloadedFilePath(item.getToken()));
         } else {
             downloader.start();
@@ -134,7 +150,7 @@ public class NormalActivity extends AppCompatActivity {
                 .setListener(listener)
                 .setUrl(item.getUri())
                 .setToken(item.getToken())
-                .setKeptAllDownload(false)//if true: canceled download token keep in db
+                .setKeptAllDownload(false)//if true: canceled download token keep in database
                 .setAllowedOverRoaming(true)
                 .setVisibleInDownloadsUi(true)
                 .setDescription(Utils.readableFileSize(item.getFileSize()))
@@ -151,16 +167,18 @@ public class NormalActivity extends AppCompatActivity {
     }
 
     private ActionListener getDeleteListener(
-            final ImageView ivAction
+            final FileItem item
+            , final ImageView ivAction
             , final ViewGroup btnAction
             , final RoundCornerProgressBar downloadProgressBar
-            , ProgressWheel progressWheel
+            , IndeterminateRoundCornerProgressBar progressWheel
             , final TextView tvSize
             , final TextView tvSpeed
             , final TextView tvPercent) {
         return new ActionListener() {
             @Override
             public void onSuccess() {
+                item.setDownloadStatus(DownloadStatus.NONE);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 downloadProgressBar.setProgress(0);
                 tvSize.setText(" Deleted");
@@ -176,10 +194,12 @@ public class NormalActivity extends AppCompatActivity {
         };
     }
 
-    private DownloadListener getDownloadListener(final View btnAction
+    private DownloadListener getDownloadListener(
+            final FileItem item
+            , final View btnAction
             , final ImageView ivAction
             , final RoundCornerProgressBar downloadProgressBar
-            , final ProgressWheel progressWheel
+            , final IndeterminateRoundCornerProgressBar loading
             , final TextView tvSize
             , final TextView tvSpeed
             , final TextView tvPercent) {
@@ -191,12 +211,13 @@ public class NormalActivity extends AppCompatActivity {
 
             @Override
             public void onComplete(int totalBytes) {
+                item.setDownloadStatus(DownloadStatus.SUCCESSFUL);
                 Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
                 setDownloadBackgroundColor(btnAction, DownloadStatus.SUCCESSFUL);
                 downloadProgressBar.setProgress(100);
                 lastStatus = DownloadStatus.SUCCESSFUL;
-                progressWheel.setVisibility(View.GONE);
+                loading.setVisibility(View.GONE);
                 tvPercent.setText("100%");
                 tvSize.setText(Utils.readableFileSize(totalBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Completed");
@@ -205,12 +226,13 @@ public class NormalActivity extends AppCompatActivity {
             @Override
             public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
                 if (lastStatus != DownloadStatus.PAUSED) {
+                    item.setDownloadStatus(DownloadStatus.PAUSED);
                     Log.i("onPause - percent: " + percent
                             + " lastStatus:" + lastStatus
                             + " reason:" + reason);
-                    ivAction.setImageResource(R.mipmap.ic_cancel);
+                    ivAction.setImageResource(R.mipmap.ic_play);
                     downloadProgressBar.setProgress(percent);
-                    progressWheel.setVisibility(View.VISIBLE);
+                    loading.setVisibility(View.VISIBLE);
                     tvPercent.setText(percent + "%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Paused");
@@ -222,10 +244,11 @@ public class NormalActivity extends AppCompatActivity {
             @Override
             public void onPending(int percent, int totalBytes, int downloadedBytes) {
                 if (lastStatus != DownloadStatus.PENDING) {
+                    item.setDownloadStatus(DownloadStatus.PENDING);
                     Log.i("onPending - lastStatus:" + lastStatus);
                     ivAction.setImageResource(R.mipmap.ic_cancel);
                     downloadProgressBar.setProgress(percent);
-                    progressWheel.setVisibility(View.VISIBLE);
+                    loading.setVisibility(View.VISIBLE);
                     tvPercent.setText(percent + "%");
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes) + " - Pending");
@@ -240,10 +263,11 @@ public class NormalActivity extends AppCompatActivity {
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
                         + " reason:" + reason);
+                item.setDownloadStatus(DownloadStatus.FAILED);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.FAILED;
-                progressWheel.setVisibility(View.GONE);
+                loading.setVisibility(View.GONE);
                 tvPercent.setText(percent + "%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Failed");
@@ -254,10 +278,11 @@ public class NormalActivity extends AppCompatActivity {
             @Override
             public void onCancel(int totalBytes, int downloadedBytes) {
                 Log.i("onCancel");
+                item.setDownloadStatus(DownloadStatus.CANCELED);
                 ivAction.setImageResource(R.mipmap.ic_start);
                 downloadProgressBar.setProgress(0);
                 lastStatus = DownloadStatus.CANCELED;
-                progressWheel.setVisibility(View.GONE);
+                loading.setVisibility(View.GONE);
                 tvPercent.setText("0%");
                 tvSize.setText(Utils.readableFileSize(downloadedBytes)
                         + "/" + Utils.readableFileSize(totalBytes) + " - Canceled");
@@ -271,9 +296,10 @@ public class NormalActivity extends AppCompatActivity {
                     lastPercent = percent;
                 }
                 if (lastStatus != DownloadStatus.RUNNING) {
-                    ivAction.setImageResource(R.mipmap.ic_cancel);
+                    item.setDownloadStatus(DownloadStatus.RUNNING);
+                    ivAction.setImageResource(R.mipmap.ic_pause);
                     setDownloadBackgroundColor(btnAction, DownloadStatus.RUNNING);
-                    progressWheel.setVisibility(View.GONE);
+                    loading.setVisibility(View.GONE);
                 }
                 downloadProgressBar.setProgress(percent);
                 lastStatus = DownloadStatus.RUNNING;

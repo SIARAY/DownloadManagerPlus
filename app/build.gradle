@@ -5,7 +5,7 @@ android {
     buildToolsVersion '29.0.3'
     defaultConfig {
         applicationId 'ir.siaray.downloadmanagerplussample'
-        minSdkVersion 14
+        minSdkVersion 17
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -35,6 +35,6 @@ dependencies {
     implementation 'com.pnikosis:materialish-progress:1.7'
     testImplementation 'junit:junit:4.12'
     implementation project(':downloadmanagerplus')
-    implementation 'com.akexorcist:RoundCornerProgressBar:2.0.3'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'com.akexorcist:round-corner-progress-bar:2.1.1'
 }

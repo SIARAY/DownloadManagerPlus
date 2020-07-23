@@ -2,6 +2,9 @@ package ir.siaray.downloadmanagerplus.classes;
 
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,6 +18,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,8 +68,7 @@ public class Downloader {
     private int mTotalBytes = -1;
     private int mNotificationVisibility = DownloadManager
             .Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED;
-    private int mNetworkTypes = DownloadManager.Request.NETWORK_WIFI
-            | DownloadManager.Request.NETWORK_MOBILE;
+    private int mNetworkTypes = ~0; //DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE;
     private boolean mScanningByMediaAllowed = false;
     private boolean mRoamingAllowed = false;
     private boolean mVisibleInDownloadsUi = true;
@@ -317,30 +323,111 @@ public class Downloader {
             }
         }
     }
-    public void pause(String title){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("control",1);
-    
-            try {
-               context.getContentResolver().update(Uri.parse("content://downloads/my_downloads"),
-                        contentValues,
-                        "title=?",
-                        new String[]{title});
-            }catch (Exception e){
+
+    /**
+     * pause download
+     *
+     * @param token the IDs of the downloads to be resumed
+     * @return the number of downloads actually paused
+     */
+    public static int pause(Context context, String token) {
+        if (!Utils.isIdEmpty(token)) {
+            DownloadItem item = getDownloadItem(context, token);
+            if (item != null) {
+                long downloadId = item.getDownloadId();
+                return pauseDownload(context, downloadId);
+            } else {
                 Log.print("Download item not found");
             }
+        } else {
+            Log.print("Download token cannot be null");
+        }
+        //return mResolver.update(mBaseUri, values, getWhereClauseForIds(ids),getWhereArgsForIds(ids));//pause multiple download
+        return -1;
     }
-    public void resume(String title){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("control",0);
-            try {
-               context.getContentResolver().update(Uri.parse("content://downloads/my_downloads"),
-                        contentValues,
-                        "title=?",
-                        new String[]{title});
-            }catch (Exception e){
+
+    public int pause() {
+        int status = pauseDownload(mContext, mDownloadId);
+        /*if(status>0){
+            Log.i("@@@ pause->pending:" + status);
+            mDownloadStatus = DownloadStatus.PENDING;
+            mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
+        }*/
+        return status;
+    }
+
+    /**
+     * resume download
+     *
+     * @param token the IDs of the downloads to be resumed
+     * @return the number of downloads actually resumed
+     */
+    public static int resume(Context context, String token) {
+        if (!Utils.isIdEmpty(token)) {
+            DownloadItem item = getDownloadItem(context, token);
+            if (item != null) {
+                return resumeDownload(context, item.getDownloadId());
+            } else {
                 Log.print("Download item not found");
             }
+        } else {
+            Log.print("Download token cannot be null");
+        }
+        //return mResolver.update(mBaseUri, values, getWhereClauseForIds(ids),getWhereArgsForIds(ids));//resume multiple download
+        return -1;
+    }
+
+    public int resume() {
+        int status = resumeDownload(mContext, mDownloadId);
+        /*if(status>0){
+            Log.i("@@@ resume->pending:" + status);
+            mDownloadStatus = DownloadStatus.PENDING;
+            mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
+        }*/
+        return status;
+    }
+
+    private static int resumeDownload(Context context, long downloadId) {
+        if (downloadId >= 0) {
+            try {
+                ContentResolver mResolver = context.getContentResolver();
+                Uri mBaseUri = Uri.parse("content://downloads/my_downloads");
+                ContentValues values = new ContentValues();
+                //values.put(Downloads.Impl.COLUMN_CONTROL, Downloads.Impl.CONTROL_RUN);
+                //values.put(Downloads.Impl.COLUMN_STATUS, Downloads.Impl.STATUS_RUNNING);
+                values.put("control", 0);
+                values.put("status", 192);
+                return mResolver.update(ContentUris.withAppendedId(mBaseUri, downloadId), values,
+                        null, null);
+            } catch (Exception e) {
+                Log.print("Resuming encountered an error");
+            }
+        } else {
+            Log.print("Download id not found");
+        }
+        return -1;
+    }
+
+    private static int pauseDownload(Context context, long downloadId) {
+        if (downloadId >= 0) {
+            try {
+                ContentResolver mResolver = context.getContentResolver();
+                Uri mBaseUri = Uri.parse("content://downloads/my_downloads");
+                ContentValues values = new ContentValues();
+                //values.put(Downloads.Impl.COLUMN_CONTROL, Downloads.Impl.CONTROL_PAUSED);
+                //values.put(Downloads.Impl.COLUMN_STATUS, Downloads.Impl.STATUS_PAUSED_BY_APP);
+                values.put("control", 1);
+                values.put("status", 193);
+                return mResolver.update(ContentUris
+                                .withAppendedId(mBaseUri, downloadId), values,
+                        null, null);
+            } catch (Exception e) {
+                Log.print("Pausing encountered an error");
+            }
+        } else {
+            Log.print("Download id not found");
+        }
+        return -1;
     }
 
     private void resetDownloadValues() {
@@ -771,5 +858,17 @@ public class Downloader {
     public Downloader setKeptAllDownload(boolean allDownloadKept) {
         mAllDownloadKept = allDownloadKept;
         return this;
+    }
+
+    public long getDownloadedBytes() {
+        return mDownloadedBytes;
+    }
+
+    public long getTotalBytes() {
+        return mTotalBytes;
+    }
+
+    public long getDownloadPercent() {
+        return mPercent;
     }
 }

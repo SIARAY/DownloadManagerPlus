@@ -2,26 +2,36 @@ package ir.siaray.downloadmanagerplussample;
 
 import android.app.DownloadManager;
 import android.content.ClipboardManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import ir.siaray.downloadmanagerplus.BuildConfig;
+import ir.siaray.downloadmanagerplus.classes.Downloader;
 import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
 import static ir.siaray.downloadmanagerplus.enums.Storage.*;
+import static ir.siaray.downloadmanagerplussample.BuildConfig.DEBUG;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.DOWNLOAD_DIRECTORY;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.STORAGE_DIRECTORY;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.downloadDirectoryArray;
@@ -180,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //tvVersion.setText("target: " + Utils.getAppTargetSdkVersion(this));
     }
 
-
     @Override
     public void onClick(View view) {
         Intent intent = null;
@@ -191,14 +200,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
-                /*List<DownloadItem> list = Downloader.getDownloadsList(getApplicationContext());
-                if (list.size() > 0) {
-                    showInfoDialog(list);
-                    //Toast.makeText(this, Log.printItems(list.get(0)), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "Download list is empty.", Toast.LENGTH_LONG).show();
-                }*/
-                //notifyThis("Notification Title", "Notification Message");
                 intent = new Intent(MainActivity.this, ListActivity.class);
                 break;
 
@@ -223,5 +224,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         }
     }
-
 }

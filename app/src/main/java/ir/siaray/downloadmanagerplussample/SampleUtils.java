@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
@@ -71,20 +72,19 @@ public class SampleUtils {
         FileItem item = new FileItem();
 
         if (number == 1) {
-            //String link = "http://wallpaperswide.com/download/friendship_4-wallpaper-1920x1200.jpg";
-            String link = "https://file-examples.com/wp-content/uploads/2017/10/file_example_JPG_100kB.jpg";
-            item.setToken("id1245");
+            String link = "https://file-examples-com.github.io/uploads/2017/10/file_example_JPG_500kB.jpg";
+            item.setToken("id1252");
             item.setUri(link);
         } else if (number == 2) {
-            //String link = "http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_10mb.mp4";
-            String link = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
-            item.setToken("id1249");
+            String link = "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4";
+            item.setToken("id1259");
             item.setUri(link);
         } else {
-            String link = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
-            item.setToken("id1280");
+            String link = "https://file-examples-com.github.io/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
+            item.setToken("id1282");
             item.setUri(link);
         }
+
         return item;
     }
 
@@ -113,10 +113,10 @@ public class SampleUtils {
                     link = "http://wallpaperpulse.com/img/2242184.jpg";
                     break;
                 case 6:
-                    link = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
+                    link = "https://file-examples-com.github.io/wp-content/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
                     break;
                 case 7:
-                    link = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
+                    link = "https://file-examples-com.github.io/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
                     break;
                 case 8:
                     link = "http://yesofcorsa.com/wp-content/uploads/2016/12/4k-Love-Wallpaper-HQ-1024x576.jpg";
@@ -246,6 +246,9 @@ public class SampleUtils {
             @Override
             public boolean onMenuItemClick(android.view.MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
+                    case R.id.popUpCancel:
+                        cancelDownload(activity, item);
+                        break;
                     case R.id.popUpDelete:
                         deleteFile(activity, item, deleteListener);
                         break;
@@ -256,6 +259,13 @@ public class SampleUtils {
                 return true;
             }
         });
+        ir.siaray.downloadmanagerplussample.Log.print("status: " + item.getToken() + " : " + item.getDownloadStatus());
+        MenuItem cancelButton = overflowPopupMenu.getMenu().getItem(0);
+        if (item.getDownloadStatus() == DownloadStatus.SUCCESSFUL
+                || item.getDownloadStatus() == DownloadStatus.FAILED
+                || item.getDownloadStatus() == DownloadStatus.CANCELED
+                || item.getDownloadStatus() == DownloadStatus.NONE)
+            cancelButton.setVisible(false);
         overflowPopupMenu.show();
     }
 
@@ -266,6 +276,14 @@ public class SampleUtils {
 
         boolean deleted = downloader.deleteFile(item.getToken(), deleteListener);
         ir.siaray.downloadmanagerplussample.Log.print("File deleted: " + deleted);
+    }
+
+    public static void cancelDownload(Context context, FileItem item) {
+        Downloader downloader = Downloader.getInstance(context)
+                .setUrl(item.getUri())
+                .setListener(item.getListener());
+
+        downloader.cancel(item.getToken());
     }
 
     public static boolean isSamsung() {
