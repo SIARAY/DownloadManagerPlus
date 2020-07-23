@@ -137,6 +137,7 @@ public class Downloader {
 
     /**
      * @param destinationDir
+     * @param fileName
      * @deprecated Custom directory only work on targetSdkVersion 28 and lower<br/>
      * If your app targetSdkVersion is 29 and higher, downloads will be saved
      * in root/Download directory.
@@ -327,6 +328,7 @@ public class Downloader {
     /**
      * pause download
      *
+     * @param context
      * @param token the IDs of the downloads to be resumed
      * @return the number of downloads actually paused
      */
@@ -359,6 +361,7 @@ public class Downloader {
     /**
      * resume download
      *
+     * @param context
      * @param token the IDs of the downloads to be resumed
      * @return the number of downloads actually resumed
      */
