@@ -312,7 +312,7 @@ public class NormalActivity extends AppCompatActivity {
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes));
                 tvSpeed.setText(Math.round(downloadSpeed) + " KB/sec");
-                Log.print("CHECK URL " + mDownloadItem.getToken());
+                Log.print("CHECK URL " + mDownloadItem.getUri());
 
             }
 
