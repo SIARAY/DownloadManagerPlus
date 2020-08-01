@@ -1,6 +1,7 @@
 package ir.siaray.downloadmanagerplus.interfaces;
 
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
 
 /**
  * Created by Siamak on 16/01/2017.
@@ -8,16 +9,16 @@ import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 
 public interface DownloadListener {
 
-    void onComplete(int totalBytes);
+    void onComplete(int totalBytes, DownloadItem downloadInfo);
 
-    void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes);
+    void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem downloadInfo);
 
-    void onPending(int percent, int totalBytes, int downloadedBytes);
+    void onPending(int percent, int totalBytes, int downloadedBytes, DownloadItem downloadInfo);
 
-    void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes);
+    void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem downloadInfo);
 
-    void onCancel(int totalBytes, int downloadedBytes);
+    void onCancel(int totalBytes, int downloadedBytes, DownloadItem downloadInfo);
 
-    void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed);
+    void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed, DownloadItem downloadInfo);
 
 }
