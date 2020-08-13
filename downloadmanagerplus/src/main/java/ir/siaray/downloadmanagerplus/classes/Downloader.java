@@ -292,7 +292,9 @@ public class Downloader {
             request.setAllowedOverMetered(mMeteredAllowed);
         }
 
-
+        cancel(mToken);
+        
+        mDownloadId = downloadManager.enqueue(request);
         DownloadItem downloadInfo = new DownloadItem();
         downloadInfo.setTotalBytes(mTotalBytes);
         downloadInfo.setTitle(mTitle);
@@ -301,13 +303,9 @@ public class Downloader {
         downloadInfo.setLocalUri(mLocalUri);
         downloadInfo.setDownloadId(mDownloadId);
         downloadInfo.setToken(mToken);
+        downloadInfo.setDownloadId(mDownloadId);
         downloadInfo.setUri(mUrl);
-
         mDownloadInfo = downloadInfo;
-
-
-        cancel(mToken);
-        mDownloadId = downloadManager.enqueue(request);
 
         Utils.updateDB(mContext, mToken, mUrl, mDownloadId);
         showProgress();
