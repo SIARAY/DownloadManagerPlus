@@ -18,10 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +74,8 @@ public class Downloader {
     private long mStartMeasureDownloadSpeedTime = 0;
     private int mLastDownloadedBytes = 0;
     private float mDownloadSpeed;
+    private DownloadItem mDownloadInfo = null;
+
 
     public static Downloader getInstance(Context mContext) {
         return (new Downloader(mContext));
@@ -221,11 +219,11 @@ public class Downloader {
         if (permissionError != 0) {
             if (mListener != null) {
                 if (permissionError == DownloadReason.INTERNET_PERMISSION_REQUIRED.getValue()) {
-                    mListener.onFail(mPercent, DownloadReason.INTERNET_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes);
+                    mListener.onFail(mPercent, DownloadReason.INTERNET_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 } else if (permissionError == DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED.getValue()) {
-                    mListener.onFail(mPercent, DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes);
+                    mListener.onFail(mPercent, DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 } else {
-                    mListener.onFail(mPercent, DownloadReason.UNKNOWN, mTotalBytes, mDownloadedBytes);
+                    mListener.onFail(mPercent, DownloadReason.UNKNOWN, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 }
             }
             return true;
@@ -234,7 +232,7 @@ public class Downloader {
         if (TextUtils.isEmpty(mUrl) || !URLUtil.isValidUrl(mUrl)) {
             Log.print("url can not be empty");
             if (mListener != null)
-                mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID, mTotalBytes, mDownloadedBytes);
+                mListener.onFail(mPercent, DownloadReason.URL_NOT_VALID, mTotalBytes, mDownloadedBytes, mDownloadInfo);
             return true;
         }
 
@@ -249,7 +247,7 @@ public class Downloader {
             Log.i("$$$ path: " + mDestinationDir);
             //createDownloadDir();
             if (!isValidDirectory(mContext, mDestinationDir)) {
-                mListener.onFail(mPercent, DownloadReason.DESTINATION_DIRECTORY_NOT_FOUND, mTotalBytes, mDownloadedBytes);
+                mListener.onFail(mPercent, DownloadReason.DESTINATION_DIRECTORY_NOT_FOUND, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 return true;
             }
         }
@@ -261,9 +259,9 @@ public class Downloader {
         if (isDownloadRunning()) {
             if (mListener != null) {
                 if (mDownloadStatus == DownloadStatus.SUCCESSFUL)
-                    mListener.onComplete(mTotalBytes);
+                    mListener.onComplete(mTotalBytes, mDownloadInfo);
                 else
-                    mListener.onFail(mPercent, DownloadReason.DOWNLOAD_IN_PROGRESS, mTotalBytes, mDownloadedBytes);
+                    mListener.onFail(mPercent, DownloadReason.DOWNLOAD_IN_PROGRESS, mTotalBytes, mDownloadedBytes, mDownloadInfo);
             }
             return true;
         }
@@ -295,7 +293,19 @@ public class Downloader {
         }
 
         cancel(mToken);
+        
         mDownloadId = downloadManager.enqueue(request);
+        DownloadItem downloadInfo = new DownloadItem();
+        downloadInfo.setTotalBytes(mTotalBytes);
+        downloadInfo.setTitle(mTitle);
+        downloadInfo.setDescription(mDescription);
+        downloadInfo.setDownloadedBytes(mDownloadedBytes);
+        downloadInfo.setLocalUri(mLocalUri);
+        downloadInfo.setDownloadId(mDownloadId);
+        downloadInfo.setToken(mToken);
+        downloadInfo.setDownloadId(mDownloadId);
+        downloadInfo.setUri(mUrl);
+        mDownloadInfo = downloadInfo;
 
         Utils.updateDB(mContext, mToken, mUrl, mDownloadId);
         showProgress();
@@ -329,7 +339,7 @@ public class Downloader {
      * pause download
      *
      * @param context
-     * @param token the IDs of the downloads to be resumed
+     * @param token   the IDs of the downloads to be resumed
      * @return the number of downloads actually paused
      */
     public static int pause(Context context, String token) {
@@ -362,7 +372,7 @@ public class Downloader {
      * resume download
      *
      * @param context
-     * @param token the IDs of the downloads to be resumed
+     * @param token   the IDs of the downloads to be resumed
      * @return the number of downloads actually resumed
      */
     public static int resume(Context context, String token) {
@@ -556,24 +566,24 @@ public class Downloader {
 
         switch (mDownloadStatus) {
             case SUCCESSFUL:
-                mListener.onComplete(mTotalBytes);
+                mListener.onComplete(mTotalBytes, mDownloadInfo);
                 break;
             case PAUSED:
-                mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                mListener.onPause(mPercent, mReason, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 break;
             case PENDING:
-                mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes);
+                mListener.onPending(mPercent, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 break;
             case FAILED:
-                mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes);
+                mListener.onFail(mPercent, mReason, mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 break;
             case CANCELED:
                 continuous[0] = false;
-                mListener.onCancel(mTotalBytes, mDownloadedBytes);
+                mListener.onCancel(mTotalBytes, mDownloadedBytes, mDownloadInfo);
                 break;
             default://Running
                 measureDownloadSpeed();
-                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes, mDownloadSpeed);
+                mListener.onRunning(mPercent, mTotalBytes, mDownloadedBytes, mDownloadSpeed, mDownloadInfo);
                 break;
         }
     }
