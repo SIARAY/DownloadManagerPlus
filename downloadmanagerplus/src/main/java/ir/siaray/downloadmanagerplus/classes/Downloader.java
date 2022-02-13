@@ -23,7 +23,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
 import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
@@ -32,6 +34,7 @@ import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
 import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.model.DownloadManagerHeader;
 import ir.siaray.downloadmanagerplus.utils.Constants;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Strings;
@@ -78,6 +81,9 @@ public class Downloader {
     private long mStartMeasureDownloadSpeedTime = 0;
     private int mLastDownloadedBytes = 0;
     private float mDownloadSpeed;
+    //private String mHeader;
+    //private String mHeaderValue;
+    private ArrayList<DownloadManagerHeader> mHeader;
 
     public static Downloader getInstance(Context mContext) {
         return (new Downloader(mContext));
@@ -127,6 +133,16 @@ public class Downloader {
 
     public Downloader setDescription(String description) {
         mDescription = description;
+        return this;
+    }
+
+    public Downloader addRequestHeader(String header, String value) {
+        if (mHeader == null)
+            mHeader = new ArrayList<DownloadManagerHeader>();
+        DownloadManagerHeader downloadManagerHeader = new DownloadManagerHeader();
+        downloadManagerHeader.setHeader(header);
+        downloadManagerHeader.setValue(value);
+        mHeader.add(downloadManagerHeader);
         return this;
     }
 
@@ -279,6 +295,13 @@ public class Downloader {
                 .setVisibleInDownloadsUi(mVisibleInDownloadsUi)
                 .setNotificationVisibility(mNotificationVisibility);
 
+        if (mHeader != null) {
+            for (DownloadManagerHeader header:mHeader
+                 ) {
+                request.addRequestHeader(header.getHeader(), header.getValue());
+            }
+        }
+
         if (mScanningByMediaAllowed)
             request.allowScanningByMediaScanner();
 
@@ -329,7 +352,7 @@ public class Downloader {
      * pause download
      *
      * @param context
-     * @param token the IDs of the downloads to be resumed
+     * @param token   the IDs of the downloads to be resumed
      * @return the number of downloads actually paused
      */
     public static int pause(Context context, String token) {
@@ -362,7 +385,7 @@ public class Downloader {
      * resume download
      *
      * @param context
-     * @param token the IDs of the downloads to be resumed
+     * @param token   the IDs of the downloads to be resumed
      * @return the number of downloads actually resumed
      */
     public static int resume(Context context, String token) {

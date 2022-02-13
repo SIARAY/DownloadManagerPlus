@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+//apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION as int
@@ -31,11 +31,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation "androidx.annotation:annotation:1.1.0"
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.annotation:annotation:1.3.0"
 }
 
-publish {
+/*publish {
     userOrg = USER_NAME as String
     groupId = GROUP as String
     artifactId = LIBRARY_ARTIFACT_ID as String
@@ -44,4 +44,4 @@ publish {
     desc = LIBRARY_DESCRIPTION as String
     website = GITHUB_URL as String
     issueTracker = ISSUE_TRACKER as String
-}
+}*/

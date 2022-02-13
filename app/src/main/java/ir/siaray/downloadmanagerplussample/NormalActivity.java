@@ -157,6 +157,7 @@ public class NormalActivity extends AppCompatActivity {
                 .setScanningByMediaScanner(true)
                 .setNotificationVisibility(NOTIFICATION_VISIBILITY)
                 .setAllowedNetworkTypes(Request.NETWORK_WIFI | Request.NETWORK_MOBILE)
+                .addRequestHeader("YourHeader","YourValue")
                 //.setCustomDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))//TargetApi 28 and lower
                 .setDestinationDir(DOWNLOAD_DIRECTORY, Utils.getFileName(item.getUri()))
                 .setNotificationTitle(SampleUtils.getFileShortName(Utils.getFileName(item.getUri())));

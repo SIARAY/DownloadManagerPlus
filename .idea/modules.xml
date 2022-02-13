@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DownloadManagerPlus.iml" filepath="$PROJECT_DIR$/DownloadManagerPlus.iml" group="DownloadManagerPlus" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="DownloadManagerPlus/app" />
-      <module fileurl="file://$PROJECT_DIR$/downloadmanagerplus/downloadmanagerplus.iml" filepath="$PROJECT_DIR$/downloadmanagerplus/downloadmanagerplus.iml" group="DownloadManagerPlus/downloadmanagerplus" />
+      <module fileurl="file://$PROJECT_DIR$/DownloadManagerPlus.iml" filepath="$PROJECT_DIR$/DownloadManagerPlus.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DownloadManagerPlus.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DownloadManagerPlus.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/downloadmanagerplus/DownloadManagerPlus.downloadmanagerplus.iml" filepath="$PROJECT_DIR$/.idea/modules/downloadmanagerplus/DownloadManagerPlus.downloadmanagerplus.iml" />
     </modules>
   </component>
 </project>
