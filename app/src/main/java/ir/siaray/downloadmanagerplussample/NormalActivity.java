@@ -27,6 +27,7 @@ import ir.siaray.downloadmanagerplus.enums.DownloadStatus;
 import ir.siaray.downloadmanagerplus.enums.Errors;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
 import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
 
@@ -211,7 +212,7 @@ public class NormalActivity extends AppCompatActivity {
             int lastPercent = 0;
 
             @Override
-            public void onComplete(int totalBytes) {
+            public void onComplete(int totalBytes, DownloadItem mDownloadItem) {
                 item.setDownloadStatus(DownloadStatus.SUCCESSFUL);
                 Log.i("onComplete");
                 ivAction.setImageResource(R.mipmap.ic_complete);
@@ -225,7 +226,7 @@ public class NormalActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
+            public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem mDownloadItem) {
                 if (lastStatus != DownloadStatus.PAUSED) {
                     item.setDownloadStatus(DownloadStatus.PAUSED);
                     Log.i("onPause - percent: " + percent
@@ -244,7 +245,7 @@ public class NormalActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPending(int percent, int totalBytes, int downloadedBytes) {
+            public void onPending(int percent, int totalBytes, int downloadedBytes, DownloadItem mDownloadItem) {
                 if (lastStatus != DownloadStatus.PENDING) {
                     item.setDownloadStatus(DownloadStatus.PENDING);
                     Log.i("onPending - lastStatus:" + lastStatus);
@@ -260,7 +261,7 @@ public class NormalActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
+            public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem mDownloadItem) {
                 //Toast.makeText(NormalActivity.this, "Failed: " + reason, Toast.LENGTH_SHORT).show();
                 Log.i("onFail - percent: " + percent
                         + " lastStatus:" + lastStatus
@@ -278,7 +279,7 @@ public class NormalActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancel(int totalBytes, int downloadedBytes) {
+            public void onCancel(int totalBytes, int downloadedBytes, DownloadItem mDownloadItem) {
                 Log.i("onCancel");
                 item.setDownloadStatus(DownloadStatus.CANCELED);
                 ivAction.setImageResource(R.mipmap.ic_start);
@@ -292,7 +293,7 @@ public class NormalActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed) {
+            public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed, DownloadItem mDownloadItem) {
                 if (percent > lastPercent) {
                     Log.i("onRunning percent: " + percent);
                     lastPercent = percent;
@@ -312,6 +313,7 @@ public class NormalActivity extends AppCompatActivity {
                     tvSize.setText(Utils.readableFileSize(downloadedBytes)
                             + "/" + Utils.readableFileSize(totalBytes));
                 tvSpeed.setText(Math.round(downloadSpeed) + " KB/sec");
+                Log.print("CHECK URL " + mDownloadItem.getUri());
 
             }
 

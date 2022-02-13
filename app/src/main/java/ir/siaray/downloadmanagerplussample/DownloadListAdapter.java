@@ -3,7 +3,6 @@ package ir.siaray.downloadmanagerplussample;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.os.Build;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.akexorcist.roundcornerprogressbar.indeterminate.IndeterminateRoundCornerProgressBar;
-import com.pnikosis.materialishprogress.ProgressWheel;
+
+import java.util.List;
 
 import ir.siaray.downloadmanagerplus.classes.Downloader;
 import ir.siaray.downloadmanagerplus.enums.DownloadReason;
@@ -25,9 +25,9 @@ import ir.siaray.downloadmanagerplus.enums.Errors;
 import ir.siaray.downloadmanagerplus.enums.Storage;
 import ir.siaray.downloadmanagerplus.interfaces.ActionListener;
 import ir.siaray.downloadmanagerplus.interfaces.DownloadListener;
+import ir.siaray.downloadmanagerplus.model.DownloadItem;
+import ir.siaray.downloadmanagerplus.utils.Log;
 import ir.siaray.downloadmanagerplus.utils.Utils;
-
-import java.util.List;
 
 import static ir.siaray.downloadmanagerplussample.SampleUtils.DOWNLOAD_DIRECTORY;
 import static ir.siaray.downloadmanagerplussample.SampleUtils.NOTIFICATION_VISIBILITY;
@@ -85,7 +85,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
         });
         showProgress(holder, item, position);
         Log.print("i: " + position + " item: " + item);
-        Log.print("status: " +position+" : "+ item.getDownloadStatus());
+        Log.print("status: " + position + " : " + item.getDownloadStatus());
 
         initItem(holder, item);
         holder.itemView.setTag(item);
@@ -169,7 +169,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
 //            int lastPercent = 0;
 
             @Override
-            public void onComplete(int totalBytes) {
+            public void onComplete(int totalBytes, DownloadItem downloadInfo) {
                 Log.print("onComplete: " + position);
                 item.setDownloadStatus(DownloadStatus.SUCCESSFUL);
                 item.setPercent(100);
@@ -185,7 +185,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
 
             @Override
-            public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
+            public void onPause(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem downloadInfo) {
                 Log.print("onPause: " + position);
                 if (isCurrentListViewItemVisible(position)) {
                     if (item.getDownloadStatus() != DownloadStatus.PAUSED) {
@@ -202,8 +202,8 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
 
             @Override
-            public void onPending(int percent, int totalBytes, int downloadedBytes) {
-                Log.print("onPending: " + position+" : "+isCurrentListViewItemVisible(position));
+            public void onPending(int percent, int totalBytes, int downloadedBytes, DownloadItem downloadInfo) {
+                Log.print("onPending: " + position + " : " + isCurrentListViewItemVisible(position));
                 if (isCurrentListViewItemVisible(position)) {
                     if (item.getDownloadStatus() != DownloadStatus.PENDING) {
                         holder.ivAction.setImageResource(R.mipmap.ic_cancel);
@@ -219,7 +219,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
 
             @Override
-            public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes) {
+            public void onFail(int percent, DownloadReason reason, int totalBytes, int downloadedBytes, DownloadItem downloadInfo) {
                 Log.print("onFail: " + position);
                 item.setDownloadStatus(DownloadStatus.FAILED);
                 item.setPercent(0);
@@ -236,7 +236,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
 
             @Override
-            public void onCancel(int totalBytes, int downloadedBytes) {
+            public void onCancel(int totalBytes, int downloadedBytes, DownloadItem downloadInfo) {
                 Log.print("onCancel: " + position);
                 item.setDownloadStatus(DownloadStatus.CANCELED);
                 item.setPercent(0);
@@ -252,7 +252,7 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
             }
 
             @Override
-            public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed) {
+            public void onRunning(int percent, int totalBytes, int downloadedBytes, float downloadSpeed, DownloadItem downloadInfo) {
                 Log.print("onRunning: " + position);
                 item.setDownloadStatus(DownloadStatus.RUNNING);
                 item.setPercent(percent);
@@ -269,6 +269,9 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                     holder.tvSpeed.setText(Math.round(downloadSpeed) + " KB/sec");
                     setDownloadBackgroundColor(holder.btnAction, DownloadStatus.RUNNING);
                 }
+
+
+                Log.i("Title: " + downloadInfo.getTitle());
             }
 
         };
@@ -358,14 +361,14 @@ public class DownloadListAdapter extends RecyclerView.Adapter<DownloadListAdapte
                 item.setPercent(0);
                 //item.setDownloadStatus(DownloadStatus.NONE);
                 //if (isCurrentListViewItemVisible(position)) {
-                    holder.ivAction.setImageResource(R.mipmap.ic_start);
-                    numberProgressBar.setProgress(item.getPercent());
-                    Toast.makeText(activity, "Deleted", Toast.LENGTH_SHORT).show();
-                    holder.downloadProgressBar.setProgress(item.getPercent());
-                    holder.loading.setVisibility(View.GONE);
-                    holder.tvPercent.setText(item.getPercent() + "%");
-                    holder.tvSize.setText("Deleted");
-                    setDownloadBackgroundColor(holder.btnAction, DownloadStatus.CANCELED);
+                holder.ivAction.setImageResource(R.mipmap.ic_start);
+                numberProgressBar.setProgress(item.getPercent());
+                Toast.makeText(activity, "Deleted", Toast.LENGTH_SHORT).show();
+                holder.downloadProgressBar.setProgress(item.getPercent());
+                holder.loading.setVisibility(View.GONE);
+                holder.tvPercent.setText(item.getPercent() + "%");
+                holder.tvSize.setText("Deleted");
+                setDownloadBackgroundColor(holder.btnAction, DownloadStatus.CANCELED);
                 // }
             }
 
