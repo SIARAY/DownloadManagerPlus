@@ -8,6 +8,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:4.1.0'
         //classpath 'com.novoda:bintray-release:0.9.2'
     }
+    
 }
 
 allprojects {
@@ -26,7 +27,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-
+/*
 ext {
     ARTIFACT_ID = LIBRARY_ARTIFACT_ID as String
     VERSION_NAME = LIBRARY_VERSION_NAME as String
@@ -101,4 +102,4 @@ subprojects {
             }
         }
     }
-}
+}*/

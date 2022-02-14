@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDownload.setOnClickListener(this);
         btnList.setOnClickListener(this);
         btnShowDownloads.setOnClickListener(this);
-        tvVersion.setText("v" + BuildConfig.VERSION_NAME);
+        //tvVersion.setText("v" + BuildConfig.VERSION_NAME);
         //tvVersion.setText("target: " + Utils.getAppTargetSdkVersion(this));
     }
 
