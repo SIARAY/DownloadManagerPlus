@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -72,15 +75,15 @@ public class SampleUtils {
         FileItem item = new FileItem();
 
         if (number == 1) {
-            String link = "https://file-examples-com.github.io/uploads/2017/10/file_example_JPG_500kB.jpg";
+            String link = "http://techslides.com/demos/samples/sample.jpg";
             item.setToken("id1252");
             item.setUri(link);
         } else if (number == 2) {
-            String link = "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4";
+            String link = "http://techslides.com/demos/samples/sample.pdf";
             item.setToken("id1259");
             item.setUri(link);
         } else {
-            String link = "https://file-examples-com.github.io/wp-content/uploads/2017/11/file_example_MP3_2MG.mp3";
+            String link = "http://techslides.com/demos/samples/sample.mp4";
             item.setToken("id1282");
             item.setUri(link);
         }
@@ -191,6 +194,19 @@ public class SampleUtils {
 
 
     public static boolean isStoragePermissionGranted(Activity activity) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R&&!Environment.isExternalStorageManager()) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s",activity.getPackageName())));
+                activity.startActivityForResult(intent, 1012);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                activity.startActivityForResult(intent, 1012);
+            }
+            return false;
+        }*/
         if (ActivityCompat.checkSelfPermission(activity
                 , WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {

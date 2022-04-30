@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />-->
     <!--<uses-permission android:name="android.permission.SEND_DOWNLOAD_COMPLETED_INTENTS" />-->
 
     <application

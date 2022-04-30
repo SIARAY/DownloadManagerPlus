@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
@@ -342,7 +343,12 @@ public class Utils {
         //int internetPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
         int internetPermission = PermissionChecker.checkSelfPermission(context, Manifest.permission.INTERNET);
         int permissionError = 0;
-        if (writeExternalPermission < 0) {
+        boolean externalStorageManagerEnabled = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            externalStorageManagerEnabled = Environment.isExternalStorageManager();
+        }
+
+        if (writeExternalPermission < 0 && !externalStorageManagerEnabled) {
             permissionError = DownloadReason.WRITE_EXTERNAL_STORAGE_PERMISSION_REQUIRED.getValue();
             Log.print("Permission required: " + Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
