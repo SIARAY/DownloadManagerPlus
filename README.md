@@ -9,9 +9,16 @@ Using faster and easier than Android Download Manager
 ## Getting started
 
 ##### Dependency
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
 
     dependencies {
-        implementation 'ir.siaray:downloadmanagerplus:1.4.1'
+        //implementation 'ir.siaray:downloadmanagerplus:1.4.1' //last version
+        implementation 'com.github.SIARAY:DownloadManagerPlus:1.4.2' // new version
     }
 
 ## Usage
